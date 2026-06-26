@@ -1,0 +1,23 @@
+%% _thesis_main.tex — BUILD WRAPPER (not part of the publication).
+%%
+%% Compiles the unmodified paper (main_text.tex) for embedding in the thesis.
+%% It applies two thesis-specific, output-faithful adjustments without touching
+%% the publication source:
+%%
+%%   1. Toolchain fix: TeX Live 2026's LaTeX kernel adds a compatibility
+%%      "first aid" hook (firstaid/aliascounter) that patches amsthm's \@ynthm
+%%      to alias shared theorem counters for cleveref. This collides with
+%%      thmtools 0.76's own \@ynthm patch when this paper declares its
+%%      "sibling=theorem" lemmas/corollaries, producing \newcounteralias{lemma}
+%%      {lemma} and the error "\c@lemma already defined". Removing just that one
+%%      hook restores the pre-2026 behaviour the paper was written against; the
+%%      modern kernel and all packages are otherwise untouched, so rendering is
+%%      unchanged.
+%%   2. Page numbering: blank the paper's own page number so the thesis can stamp
+%%      a single, continuous (global) number when it embeds these pages.
+%%
+%% Produces _thesis_main.pdf, which the thesis includes via \includepaper.
+\RemoveFromHook{package/amsthm/after}[firstaid/aliascounter]
+\RemoveFromHook{package/cleveref/after}[firstaid/aliascounter]
+\AtBeginDocument{\renewcommand{\thepage}{}}
+\input{main_text.tex}

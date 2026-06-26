@@ -1,0 +1,57 @@
+# Publication source archives — extracted into chapterN_*/paper/, not needed in git
+*.zip
+
+# ---------------------------------------------------------------------------
+# LaTeX build / auxiliary files (regenerated on every compile, incl. Overleaf)
+#
+# NOTE: *.pdf is deliberately NOT ignored. Figures and the embedded paper PDFs
+#       (chapterN_*/paper/_thesis_main.pdf) MUST stay committed so the thesis
+#       compiles on Overleaf, which embeds them via \includepaper but never
+#       rebuilds them. Only the top-level thesis output PDF is ignored below.
+# ---------------------------------------------------------------------------
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lol
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.nav
+*.snm
+*.vrb
+*.xdy
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+*.thm
+*.tdo
+*.maf
+*.mtc*
+*.upa
+*.upb
+*.brf
+*.ist
+*.fmt
+*.pyg
+
+# Compiled thesis output (Overleaf / latexmk regenerates this)
+/edengths.pdf
+
+# Editor / OS cruft
+*.swp
+*~
+.DS_Store

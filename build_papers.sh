@@ -17,8 +17,10 @@ PAPERS=(chapter2_deac chapter3_dred chapter4_persist)
 root="$(cd "$(dirname "$0")" && pwd)"
 for ch in "${PAPERS[@]}"; do
   dir="$root/$ch/paper"
-  echo "==== building $ch/paper/main_text.pdf ===="
-  ( cd "$dir" && latexmk -pdf -interaction=nonstopmode -halt-on-error main_text.tex )
-  echo "==== done: $ch/paper/main_text.pdf ===="
+  echo "==== building $ch/paper/_thesis_main.pdf ===="
+  # _thesis_main.tex is a thin wrapper that \input's the unmodified paper and
+  # applies the thesis-specific page-number / kernel adjustments (see that file).
+  ( cd "$dir" && latexmk -pdf -interaction=nonstopmode -halt-on-error _thesis_main.tex )
+  echo "==== done: $ch/paper/_thesis_main.pdf ===="
 done
 echo "All requested papers built. Now compile the thesis: latexmk -pdf edengths.tex"
