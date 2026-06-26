@@ -1,0 +1,100 @@
+%%
+%% packages.tex - User defined packages for edengths.tex
+%%
+%% Copyright (C) 2010-2021 Mathew Topper <damm_horse@yahoo.co.uk>
+%%
+%%   ABOUT
+%%
+%% This file contains the user defined packages for a Latex2e template which
+%% corresponds to the regulations regarding layout of a thesis submitted within
+%% the University of Edinburgh.
+
+%%%% PACKAGES AUTOMATTICALLY PROVIDED BY CLASS 
+%%%%
+%%%%  (No need to reload.  Options can be provided to these packages using the
+%%%%   \PassOptionsToPackage command as per example at end.)
+
+%% ifthen     -   Provides simple boolean commands
+
+%% ifpdf      -   Detects whether pdflatex is being used.
+
+%% graphicx   -   Allows inclusion of graphics in eps or jpg/pdf format
+
+%% geometry   -   A more modern way of setting the page margins.
+%%                'report' class options are passed automatically.
+
+%% setspace   -   Define line spacing
+
+%% appendix   -   Required for appendices
+
+%% ae         -   Nicer pdf output using T1 fonts
+
+%% fontenc    -   T1 encoding stops some errors for unknown fonts
+
+%% titlesec   -   Custom chapter titles and page headers
+
+%% caption    -   Custom formatting of captions
+
+%% subcaption -   Use subfigures in captions and formatting of such.
+
+%% tocloft    -   Allow modifications to the table of contents and lists
+
+%% mathptmx   -   Option 'msfonts' to use these alternative font packages.
+%% helvet         Note: you could add your own font packages in this file.
+
+%% showlabels -   Print labels on the page if 'labels' option is given.
+
+%% hyperef    -   Put clickable links into the document
+
+%% hypcap     -   Links to figures show the figures rather than just the
+%%                caption.
+
+%% xcolor     -   Loaded with option 'dvipsnames' with provides colors for pdf
+%%                output. The options auto adjust for pdflatex and hyperref.
+%%                See http://en.wikibooks.org/wiki/LaTeX/Colors for colours.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%          Put ADDITIONAL packages you want to use here           %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Typset URLs properly. This package does automatic breaking of long URLs.
+%% If you're using hyperref you dont need this but you might need the
+%% 'breakurl' package depending on your compilation route.
+%% Note: 'breakurl' must be the last package (which is normally 'hyperref').
+\usepackage[hyphens]{url} 
+
+%% AMS Math Packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+%% Fancy chemical symbols (Might require installation)
+% \usepackage[version=3]{mhchem}
+
+%% Better fractions ie 1/2 with diagonal slash
+\usepackage{nicefrac}
+
+%% Nicer tables
+\usepackage{booktabs}
+
+%% Citations
+\usepackage[natbibapa]{apacite}
+
+%% Proper hyphenation
+\usepackage[british]{babel}
+
+%% Rotating
+\usepackage{pdflscape}
+
+%% Paragraph control
+\usepackage[defaultlines=4,all]{nowidow}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%             Pass OPTIONS to packages you want here              %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Pass natbib the option 'numbers'
+% \PassOptionsToPackage{numbers}{natbib}
+
+
