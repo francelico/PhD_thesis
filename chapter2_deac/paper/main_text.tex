@@ -1,154 +1,42 @@
+%% ======================================================================
+%% Chapter 2 (DEAC) -- ICLR 2025 paper, integrated as native thesis source.
+%% Transformed from the published paper: conference preamble, title/author
+%% block, and bibliography removed; abstract -> "Original Abstract" section;
+%% appendix wrapped in subappendices; cross-ref labels prefixed c2:; wrapfigures
+%% unwrapped. See the plan and tools/integrate_paper.py.
+%% ======================================================================
+\graphicspath{{chapter2_deac/paper/}{chapter2_deac/paper/figs/}{chapter2_deac/paper/supp/}}
+\renewcommand{\lvl}{c}
 
-\documentclass{article} % For LaTeX2e
-\usepackage{iclr2025_conference,times}
-% \iclrfinalcopy
-% \underreview
+%% Macros the body uses that lived in the paper's (stripped) preamble.
+\newcommand{\T}{\rule{0pt}{2.4ex}}        % table top strut
+\newcommand{\B}{\rule[-1.2ex]{0pt}{0pt}}  % table bottom strut
+\providecommand{\fix}{}                    % editing annotations -> no-op
+\providecommand{\new}{}
 
-% Optional math commands from https://github.com/goodfeli/dlbook_notation.
-\input{math_commands.tex}
-
-\usepackage{hyperref}
-\usepackage{url}
-\usepackage{todonotes}
-\newcommand\todoin[2][]{\todo[inline, caption={2do}, #1]{
-\begin{minipage}{\textwidth-4pt}#2\end{minipage}}}
-%Figures & Tables
-\usepackage{enumitem}
-\usepackage{tcolorbox}
-\usepackage{wrapfig}
-\usepackage{floatflt}
-\usepackage{subcaption}
-\usepackage{makecell}
-\renewcommand{\theadfont}{\normalsize}
-\usepackage{booktabs}
-\usepackage{multirow}
-% \usepackage{array}
-% \newcolumntype{C}[1]{>{\centering\arraybackslash}c{#1}}
-% \newcolumntype{Y}{>{\centering\arraybackslash}X{2.5cm}}
-\newcommand\T{\rule{0pt}{2.4ex}}       % Top strut
-\newcommand\B{\rule[-1.2ex]{0pt}{0pt}} % Bottom strut
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THEOREMS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% For theorems and such
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{amsthm}
-\usepackage{mathrsfs}
-\usepackage{thmtools, thm-restate}
-\usepackage[capitalize,noabbrev]{cleveref}
-
-\declaretheorem[numberwithin=section]{theorem}
-\declaretheorem[numberwithin=section]{definition}
-\declaretheorem{lemma, remark, corollary}[
-style=plain,
-sibling=theorem
-]
-
-%FOOTNOTES
-\usepackage{bigfoot}
-\DeclareNewFootnote{AAffil}[arabic]
-\DeclareNewFootnote{ANote}[fnsymbol]
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\maketitle{\def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}}{}{}{}
-\makeatother
-\interfootnotelinepenalty=10000
-
-% Hook into the \thanks command for the article class to print the footnotes
-\makeatletter
-\def\thanksAAffil#1{% <--- These %'s are necessary for spacing
-  \footnotemarkAAffil\protected@xdef\@thanks{\@thanks%
-        \protect\footnotetextAAffil[\the \c@footnoteAAffil]{#1}}%
-}
-\def\thanksANote#1{%
-  \footnotemarkANote%
-  \protected@xdef\@thanks{\@thanks%
-        \protect\footnotetextANote[\the \c@footnoteANote]{#1}}%
-}
-\makeatother
-
-% \makeatletter
-% \newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
-% \makeatother
-
-\title{Studying the Interplay Between the Actor and Critic Representations in Reinforcement Learning}
-
-% Authors must not appear in the submitted version. They should be hidden
-% as long as the \iclrfinalcopy macro remains commented out below.
-% Non-anonymous submissions will be rejected without review.
-\author{Samuel Garcin\thanksANote{Equal contribution. Correspondence to \texttt{\{s.garcin,t.mcinroe\}@ed.ac.uk}} \\
-University of Edinburgh
-\And
-% Trevor Mcinroe\footnoteref{equal_contrib} \\
-Trevor McInroe\footnotemarkANote[1]\\
-University of Edinburgh
-\And
-Pablo Samuel Castro\\
-Google DeepMind, Mila
-\And
-Prakash Panangaden\\
-McGill, Mila
-\And
-Christopher G. Lucas\\
-University of Edinburgh
-\And
-David Abel\\
-Google DeepMind, University of Edinburgh
-\And
-%YIKES! How do we fix spacing in a clean way?
-\quad \quad \quad \quad \quad \quad \quad \quad \quad  \ \ \ Stefano V. Albrecht\\
-\quad \quad \quad \quad \quad \quad \quad \quad \quad \ \ \ University of Edinburgh
-}
-
-% The \author macro works with any number of authors. There are two commands
-% used to separate the names and addresses of multiple authors: \And and \AND.
-%
-% Using \And between authors leaves it to \LaTeX{} to determine where to break
-% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
-% puts 3 of 4 authors names on the first line, and the last on the second
-% line, try using \AND instead of \And before the third author name.
-
-\newcommand{\fix}{\marginpar{FIX}}
-\newcommand{\new}{\marginpar{NEW}}
-
-\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
-\begin{document}
-% \footnotetext{\label{equal_contrib}equal contribution}
-\maketitle
-\vspace{-1cm}
-% \footnote{\label{corresponding_author}correspondence to s.garcin@ed.ac.uk}
-
-%TODO: from "through a rigourous.." could be made tighter
-\begin{abstract}
+\section{Original Abstract}
 Extracting relevant information from a stream of high-dimensional observations is a central challenge for deep reinforcement learning agents. Actor-critic algorithms add further complexity to this challenge, as it is often unclear whether the same information will be relevant to both the actor and the critic. To this end, we here explore the principles that underlie effective representations for the actor and for the critic in on-policy algorithms. We focus our study on understanding whether the actor and critic will benefit from separate, rather than shared, representations. 
-Our primary finding is that when separated, the representations for the actor and critic systematically specialise in extracting different types of information from the environment---the actor's representation tends to focus on action-relevant information, while the critic's representation specialises in encoding value and dynamics information. We conduct a rigourous empirical study to understand how different representation learning approaches affect the actor and critic's specialisations and their downstream performance, in terms of sample efficiency and generation capabilities. Finally, we discover that a separated critic plays an important role in exploration and data collection during training. Our code, trained models and data are accessible at \url{github.com/francelico/deac-rep}.
+Our primary finding is that when separated, the representations for the actor and critic systematically specialise in extracting different types of information from the environment---the actor's representation tends to focus on action-relevant information, while the critic's representation specialises in encoding value and dynamics information. We conduct a rigourous empirical study to understand how different representation learning approaches affect the actor and critic's specialisations and their downstream performance, in terms of sample efficiency and generation capabilities. Finally, we discover that a separated critic plays an important role in exploration and data collection during training. Our code, trained models and data are accessible at \href{https://github.com/francelico/deac-rep}{github.com/francelico/deac-rep}.
 % over a range of discrete and continuous control tasks.
 %
 % Original version: (Oct 1)
 % Extracting relevant information from a stream of high-dimensional observations is a known challenge for deep reinforcement learning agents. Yet, in the case of actor-critic algorithms, which traditionally share the same feature embedding, or representation, between the actor and critic, it is unclear what constitutes ``relevant information'', and whether the same information is relevant for the actor and the critic's respective learning objectives. When separated, we find that the actor and critic representations will diverge in what information they extract from the environment. Yet, an interplay still exists between the actor's and critic's respective representations and challenges the notion that knowledge transfer between the critic and the actor only occurs through weight sharing or knowledge distillation. We discover that a separate critic will still influence policy updates to ensure future trajectories will contain information relevant to its own learning objective. This in turn may cause information to leak into the actor's representation, even when no direct knowledge distillation is taking place. Finally, we demonstrate how these insights help select representation learning objectives that play into the actor's and critic's respective knowledge specialisations, and improve performance over a range of discrete and continuous control tasks.
-\end{abstract}
 
 \section{Introduction}
-\begin{wrapfigure}[]{r}{0.34\textwidth}
-\vspace{-0.6cm}
+% wrapfigure unwrapped to a normal float (original wrap width 0.34\textwidth).
+\begin{figure}[t]
     \centering
-    \begin{subfigure}[]{0.45\linewidth}
-    \includegraphics[width=1\linewidth]{figs/coupled_arch-cropped.pdf}
-    % \vspace{-0.7cm}
-    % \caption{Coupled actor-critic architecture}
+    \begin{subfigure}[]{0.16\textwidth}
+    \includegraphics[width=\linewidth]{figs/coupled_arch-cropped.pdf}
     \end{subfigure}
-    \begin{subfigure}[]{0.45\linewidth}
-    \includegraphics[width=1\linewidth]{figs/decoupled_arch-cropped.pdf}
-    % \caption{Decoupled actor-critic architecture}
+    \begin{subfigure}[]{0.16\textwidth}
+    \includegraphics[width=\linewidth]{figs/decoupled_arch-cropped.pdf}
     \end{subfigure}
-    \caption{Models with shared (left) and decoupled representations (right).}\label{fig:1}
-\end{wrapfigure}
-In recent years, auxiliary representation learning objectives have become increasingly prominent in deep reinforcement learning (RL) agents~\citep{yarats2021image,mhairiCMID}. These objectives facilitate extracting relevant features from high dimensional observations, and can help improve the sample efficiency and generalisation capabilities of both value-based~\citep{anand2019unsupervised,spr} and actor-critic methods~\citep{sac-ae,dbc,hksl}. However, knowing whether a particular representation learning objective will work and understanding \textit{why} it works is often difficult due to the interplay between the different components of modern RL algorithms.
+    \caption{Models with shared (left) and decoupled representations (right).}\label{c2:fig:1}
+\end{figure}
+In recent years, auxiliary representation learning objectives have become increasingly prominent in deep reinforcement learning (RL) agents~\citep{yarats2021image,mhairiCMID}. These objectives facilitate extracting relevant features from high dimensional observations, and can help improve the sample efficiency and generalisation capabilities of both value-based~\citep{anand2019unsupervised,Schwarzer2021DataEfficientRL} and actor-critic methods~\citep{sac-ae,dbc,mcinroe2023hksl}. However, knowing whether a particular representation learning objective will work and understanding \textit{why} it works is often difficult due to the interplay between the different components of modern RL algorithms.
 
-Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy improvement and value estimation objectives. When parametrised by deep neural networks, the actor (in charge of improving the policy) and the critic (in charge of estimating the value of the current policy) often share the same learned representation $\phi$, which maps observations to latent features $z$. \citet{PPG} and \citet{raileanu2021decoupling} report that fully separating the actor and critic networks, i.e. \textit{decoupling} the two (\Cref{fig:1}, right), improves sample efficiency and generalisation over a shared architecture (\Cref{fig:1}, left). We hypothesise that decoupling is effective because it encourages information specialisation in $\phi_A$ and $\phi_C$, which in turn improves performance. To test our hypothesis, we introduce metrics to quantify specialisation, and we conduct an extensive empirical study of three on-policy actor-critic algorithms~\citep{PPO,PPG,DCPG} across discrete and continuous control benchmarks, and under various representation learning approaches~\citep{raileanu2021decoupling,DCPG,raileanu2021UCB-DrAC,MICo} applied to the actor, to the critic, or to both.  We supplement this empirical study by a theoretical characterisation of the information extracted by the actor and critic's respective optimal representations.
+Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy improvement and value estimation objectives. When parametrised by deep neural networks, the actor (in charge of improving the policy) and the critic (in charge of estimating the value of the current policy) often share the same learned representation $\phi$, which maps observations to latent features $z$. \citet{PPG} and \citet{raileanu2021decoupling} report that fully separating the actor and critic networks, i.e. \textit{decoupling} the two (\Cref{c2:fig:1}, right), improves sample efficiency and generalisation over a shared architecture (\Cref{c2:fig:1}, left). We hypothesise that decoupling is effective because it encourages information specialisation in $\phi_A$ and $\phi_C$, which in turn improves performance. To test our hypothesis, we introduce metrics to quantify specialisation, and we conduct an extensive empirical study of three on-policy actor-critic algorithms~\citep{PPO,PPG,DCPG} across discrete and continuous control benchmarks, and under various representation learning approaches~\citep{raileanu2021decoupling,DCPG,raileanu2021UCB-DrAC,MICo} applied to the actor, to the critic, or to both.  We supplement this empirical study by a theoretical characterisation of the information extracted by the actor and critic's respective optimal representations.
 % \begin{wrapfigure}[]{r}{0.17\textwidth}
 % \vspace{-1cm}
 %     \centering
@@ -161,7 +49,7 @@ Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy impr
 %     \includegraphics[width=1\linewidth]{figs/decoupled_arch-cropped.pdf}
 %     % \caption{Decoupled actor-critic architecture}
 %     \end{subfigure}
-%     \caption{Models with shared (top) and decoupled representations (bottom).}\label{fig:1}
+%     \caption{Models with shared (top) and decoupled representations (bottom).}\label{c2:fig:1}
 %     \vspace{-1.5cm}
 % \end{wrapfigure}
 
@@ -177,14 +65,15 @@ Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy impr
 %     \includegraphics[width=0.5\linewidth]{figs/decoupled_arch-cropped.pdf}
 %     % \caption{Decoupled actor-critic architecture}
 %     \end{subfigure}
-%     \caption{Models with shared (left) and decoupled representations (right).}\label{fig:1}
+%     \caption{Models with shared (left) and decoupled representations (right).}\label{c2:fig:1}
 % \end{figure}
 %
 \begin{table}[!h]
     \centering
-        \caption{Once decoupled, the actor and critic representations $\phi_A$ and $\phi_C$ specialise in capturing different information from the environment. Reported values correspond to a PPO agent trained in Procgen \citep{procgen}. See \S\ref{sec:bg} and \S\ref{sec:met} for formal definitions of the quantities quoted.}
-    \label{tab:1}
+        \caption{Once decoupled, the actor and critic representations $\phi_A$ and $\phi_C$ specialise in capturing different information from the environment. Reported values correspond to a PPO agent trained in Procgen \citep{procgen}. See \S\ref{c2:sec:bg} and \S\ref{c2:sec:met} for formal definitions of the quantities quoted.}
+    \label{c2:tab:1}
 %    
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{clcc}
 \toprule
 \multicolumn{1}{l}{\multirow{2}{*}{If ... is high,}} & \multirow{2}{*}{it is possible to ...}                                                                                                                            & \multicolumn{2}{l}{\begin{tabular}[c]{@{}l@{}}\% change from using a \\ shared representation\end{tabular}} \\
@@ -192,10 +81,11 @@ Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy impr
 \multicolumn{1}{l}{}                                 &                                                                                                                                                                   & \multicolumn{1}{c}{\Large{$\phi_A$}} \B                                  & \Large{$\phi_C$} \B                               \\ \hline
 $\mut{Z}{L}$                                          & \begin{tabular}[c]{@{}l@{}}\T overfit to training levels (environment instances).\B\end{tabular} & \multicolumn{1}{c}{\large{-20\%}}                                & \large{+35\%}                                 \\
 $\mut{Z}{V}$                                          & use $z$ to predict state values.\B                                                                                                                                  & \multicolumn{1}{c}{\large{+37\%}}                                  & \large{+41\%}                                 \\
-$\mut{(Z,Z')}{A}$                                     & \begin{tabular}[c]{@{}l@{}}use $z$ and $z’$ obtained from consecutive timesteps $t$, $t’$\\ to identify the action taken at timestep $t$.\B\end{tabular}            & \multicolumn{1}{c}{\large{+23\%}}                                  & \large{-48\%}                                 \\
+$\mut{(Z,Z')}{A}$                                     & \begin{tabular}[c]{@{}l@{}}use $z$ and $z'$ obtained from consecutive timesteps $t$, $t'$\\ to identify the action taken at timestep $t$.\B\end{tabular}            & \multicolumn{1}{c}{\large{+23\%}}                                  & \large{-48\%}                                 \\
 $\mut{Z}{Z'}$                                         & \begin{tabular}[c]{@{}l@{}}differentiate between latent pairs obtained from \\ consecutive and non-consecutive timesteps.\end{tabular}                            & \multicolumn{1}{c}{\large{-96\%}}                                  & \large{+324\%} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 % \vspace{-0.2cm}
 \end{table}
 %
@@ -224,7 +114,7 @@ $\mut{Z}{Z'}$                                         & \begin{tabular}[c]{@{}l@
 \begin{tcolorbox}[colback=gray!10,
 leftrule=0.5mm,top=0mm,bottom=0mm]
 Our main findings are summarised below.\begin{itemize}[leftmargin=*]
-    \item Decoupled actor and critic representations extract different information about the environment. This information specialisation, described and quantified in \Cref{tab:1}, systematically occurs in the on-policy algorithms and benchmarks covered by our study, and is consistent with the actor's and critic's respective optimal representations.
+    \item Decoupled actor and critic representations extract different information about the environment. This information specialisation, described and quantified in \Cref{c2:tab:1}, systematically occurs in the on-policy algorithms and benchmarks covered by our study, and is consistent with the actor's and critic's respective optimal representations.
     % \item \textbf{For the actor, regularisation matters most.} We find performance to be tightly correlated to the degree of overfitting of the actor representation to individual training levels. Thus, the actor should be encouraged to capture information shared across all levels and to disregard information specific to individual levels.
     \item The actor benefits from representation learning approaches that prioritise extracting level-invariant information over level-specific information. This bias for level-invariant information matters more than what specific information quantity is targeted by the representation learning objective. Nevertheless, approaches antithetical to the actor's inherent information specialisation tend to perform poorly.
     \item Through its role as a baseline in the actor's objective, a decoupled critic will tend to bias policy updates to facilitate the optimisation of its own learning objective. The critic, therefore, plays an important role in exploration and data collection during training. Thus, we find that care must be taken when selecting a representation learning objective for the critic: certain objectives improve the critic's value predictions but may prevent convergence to the optimal policy because the objective induces significant bias.
@@ -232,7 +122,7 @@ Our main findings are summarised below.\begin{itemize}[leftmargin=*]
 %
 \end{tcolorbox}
 %
-\section{Background}\label{sec:bg}
+\section{Background}\label{c2:sec:bg}
 % \textbf{Reinforcement learning.} We consider the episodic RL setting, and model the environment as a Markov Decision Process (MDP) $( \sA, \sS, \mathcal{T}, R, p_0, \gamma )$ where $\sA$ is the action space, $\sS$ is the state space, $\mathcal{T} : \sS \times \sA \rightarrow \Delta^\sS$ the transition kernel (denoting $\Delta^\sS$ as the probability simplex over $\sS$), $R:\sS\times \sA\rightarrow \sR$ is the reward function, $p_0 \in \Delta^{\sS}$ is the initial state distribution and $\gamma$ is the discount factor. % We consider the episodic RL setting, and model an individual environment instance as a Partially Observable Markov Decision Process (POMDP) $( \sA, \sO, \sS, \mathcal{T}, \Omega, R, p_0, \gamma )$ where $\sA$ is the action space, $\sO$ is the observation space, $\sS$ is the state space, $\mathcal{T} : \sS \times \sA \rightarrow \Delta^\sS$ and $\Omega: \sS \rightarrow \Delta^\sO$ are the transition and observation kernels (denoting $\Delta^\sS$ as the probability simplex over $\sS$), $R:\sS\times \sA\rightarrow \sR$ is the reward function, $p_0 \in \Delta^{\sS}$ is the initial state distribution and $\gamma$ is the discount factor. 
 % The RL agent attempts to learn a policy $\pi : \sS \rightarrow \Delta^{\sA} $ maximising the expected discounted return $V^\pi (s_t) = \mathbb{E}_\pi[\sum^T_{\bar{t}=t}\gamma^{t - \bar{t}} r_t]$ over an episode terminating at timestep $t=T$. %We use $V^\pi$ to refer to $V^\pi (s_0)$, the expected episodic returns taken from the first timestep of the episode.
 %
@@ -241,15 +131,17 @@ Our main findings are summarised below.\begin{itemize}[leftmargin=*]
 \textbf{Actor-critic architectures.} On-policy actor-critic models consist of a policy network $\pi_{\vtheta_A}$ and a value network $\hat{V}_{\vtheta_C}$, with \textit{actor} parameters ${\vtheta_A}$ and \textit{critic} parameters $\vtheta_C$ (we use $\cdot_A/\cdot_C$ when referring to the actor$/$critic in this work). When learning from high dimensional observations, such as pixels, a representation $\phi:\sO \rightarrow \sZ$ maps observations to latent features $z \in \sZ$. When coupled, the policy and value networks share a representation and split into actor and critic heads $f$ and $\hat{v}$. That is, we have $\pi_{\vtheta_A} \triangleq f_{\vomega} \circ \phi_\veta$ and $\hat{V}_{\vtheta_C} \triangleq \hat{v}_{\vxi} \circ \phi_\veta$, with $\vtheta_A\triangleq (\vomega,\veta)$ and $\vtheta_C \triangleq (\vxi,\veta)$. When decoupled, two representation functions $\phi_A$, $\phi_C$ with parameters $(\veta_A,\veta_C)$ are learned.
 
 \textbf{PPO and PPG.} In this work, we investigate the representation properties of PPO \citep{PPO} and Phasic Policy Gradient (PPG) \citep{PPG}, two actor-critic algorithms that have been reported to benefit from improved sample efficiency and transfer upon decoupling \citep{raileanu2021decoupling, PPG}. In PPO, the actor maximises
-\begin{equation}\label{eq:J_PPO}
+\begin{equation}\label{c2:eq:J_PPO}
+    \resizebox{\linewidth}{!}{$\displaystyle
     J_\pi(\vtheta_A) = \E_{B}\bigg[ \min (\frac{\pi_{\vtheta_A} (a_t|o_t)}{\pi_{{\vtheta_A}_{old}} (a_t|o_t)}\hat{A}_t, \text{clip}(\frac{\pi_{\vtheta_A} (a_t|o_t)}{\pi_{{\vtheta_A}_{old}} (a_t|o_t)}, 1 - \epsilon, 1 + \epsilon)\hat{A}_t) + \beta_H \entropy(\pi_{\vtheta_A}(a_t|o_t))\bigg],
+    $}
 \end{equation}
 where ${\vtheta_A}_{old}$ are the actor weights before starting a round of policy updates, $B$ is a batch of trajectories collected with $\pi_{{\vtheta_A}_{old}}$, $\hat{A}_t$ is an estimator for the advantage function at timestep $t$, $\entropy(\cdot)$ denotes the entropy and $\eps$ and $\beta_H$ are hyperparameters controlling clipping and the entropy bonus. The critic minimises
-\begin{equation}\label{eq:LV_PPO}
+\begin{equation}\label{c2:eq:LV_PPO}
     \ell_V(\vtheta_C) = \frac{1}{|B|} \sum_{o_t \in B} (\hat{V}_{\vtheta_C}(o_t) - \hat{V}_t)^2, 
 \end{equation}
 where $\hat{V}_t$ are value targets. Both $\hat{A}$ and $\hat{V}$ are computed using GAE \citep{GAE}. PPG performs an auxiliary phase after conducting PPO updates over $N_\pi$ policy phases. To prevent overfitting, the auxiliary phase fine-tunes the critic and distills value information into the representation from much larger trajectory batches $B_{aux} = \bigcup_{i\in 1, \dots, N_\pi} B_i$, using the loss $\ell_\text{joint} = \ell_V + \ell_{aux}$, with
-\begin{equation}\label{eq:PPG_Laux}
+\begin{equation}\label{c2:eq:PPG_Laux}
     \ell_{aux}(\vtheta_A) = \frac{1}{|B_{aux}|}\sum_{(a_t,o_t) \in B_{aux}}(\hat{V}^{aux}_{\vtheta_A}(o_t) - \hat{V}_t)^2 + \beta_{c} \KL ( \pi_{{\vtheta_A}_{old}}(a_t|o_t) \Vert \pi_{{\vtheta_A}}(a_t|o_t)),
 \end{equation}
 where $\beta_\text{c}$ controls the distortion of the policy. When decoupled, $\hat{V}^{aux}\triangleq v^{aux} \circ \phi_{A} $ distills value information into representation parameters $\veta_A$ through an additional head $v^{aux}$. When coupled, $v^{aux} \equiv \hat{v}$, and a stop-gradient operation on $\ell_V$ ensures $\veta$ is updated by the critic during the auxiliary phase only.
@@ -263,35 +155,35 @@ We measure mutual information using the k-nearest neighbors entropy estimator pr
 % This makes $V$ a collection of samples collected in $L$ of the random variable determining state values. %are samples collected in $L$ of the random variable determining state values, %Writing $V^\pi(x|L)$ as the value of $x$ when the expectation is taken over $L$, we have $V^\pi (x|L) = \E[V_{v_t|x_t=x}]$. In other words, 
 %It is non-negative, and $\mut{X}{Y}=0$ means that $X$ and $Y$ are independently distributed. $\mut{X}{Y}$ captures linear and non-linear dependencies and invariant to scaling or permutations 
 %
-\section{Categorising and quantifying the information extracted by learned representations}\label{sec:met}
+\section[Categorising and quantifying extracted information]{Categorising and quantifying the information extracted by learned representations}\label{c2:sec:met}
 %
 To conduct our analysis of the respective functions of the actor and critic representations, we analyse the information being extracted from observations at agent convergence. We propose four mutual information metrics to measure information extracted about the identity of the current training level, the value function, and the inverse and forward dynamics of the environment. Each metric relates to quantities relevant to the actor and critic's respective learning objectives, and to the agent's generalisation performance. They are introduced in turn below.
 %This categorisation is not meant t completely capture what information gets extracted by representations. However, it highlights a specialisation for the actor's and critic's representations. Moreover, our proposed categorisation is strengthened by different theoretical arguments, which are discussed next.
-%Aside from the value function, the actor and critic specialise in learning features pertaining to different characteristics of the environment. The actor represents information pertaining to the inverse transition dynamics, while the critic focuses on the forward state transition dynamics and on the identity of the current environment instance. Vertical bars indicate the mean measurements across the Procgen benchmark (5 seeds) and boxes indicate the 95\% confidence interval. The methodology to measure each information quantity is described in \Cref{sec:bg_met}.
+%Aside from the value function, the actor and critic specialise in learning features pertaining to different characteristics of the environment. The actor represents information pertaining to the inverse transition dynamics, while the critic focuses on the forward state transition dynamics and on the identity of the current environment instance. Vertical bars indicate the mean measurements across the Procgen benchmark (5 seeds) and boxes indicate the 95\% confidence interval. The methodology to measure each information quantity is described in \Cref{c2:sec:bg_met}.
 
-\textbf{Overfitting.} Our first metric, $\mut{Z}{L}$, quantifies overfitting of the actor and critic representations to the set of training levels, as it measures how easy it is to infer the identity of the current level from $Z$. We follow a similar reasoning as \citet{Garcin2024DREDZT} to derive an upper bound for the generalisation error that is proportional to $\mut{Z_A}{L}$.\footnote{Proofs for the theoretical results presented in this work are provided in \Cref{app:proof}.}
-\begin{restatable}{theorem}{THGenBound}\label{th:genbound}
+\textbf{Overfitting.} Our first metric, $\mut{Z}{L}$, quantifies overfitting of the actor and critic representations to the set of training levels, as it measures how easy it is to infer the identity of the current level from $Z$. We follow a similar reasoning as \citet{garcin2024dred} to derive an upper bound for the generalisation error that is proportional to $\mut{Z_A}{L}$.\footnote{Proofs for the theoretical results presented in this work are provided in \Cref{c2:app:proof}.}
+\begin{restatable}{theorem}{THGenBound}\label{c2:th:genbound}
 The difference in returns achieved in train levels and under the full distribution, or generalisation error, has an upper bound that depends on $\mut{Z_A}{L}$, with
 \begin{equation}
     \E_{c\sim \mathcal{U}(L), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] - \E_{c\sim P(\rc), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] \leq \sqrt{\frac{2D^2}{|L|} \times \mut{Z_A}{L}},
 \end{equation}
 where $c\sim \mathcal{U}(L)$ indicates $c$ is sampled uniformly over levels in $L$, $D$ is a constant such that $|V^\pi (x)| \leq D/2,\forall x,\pi$ and $Z_A$ is the output space of the actor's learned representation.
 \end{restatable}
-%\citet{Garcin2024DREDZT} conduct additional experiments to show that reducing $\mut{Z_A}{L}$ acts as an effective surrogate objective for minimising the generalisation error of PPO under a shared representation.%
+%\citet{garcin2024dred} conduct additional experiments to show that reducing $\mut{Z_A}{L}$ acts as an effective surrogate objective for minimising the generalisation error of PPO under a shared representation.%
 
 %TODO MOVE SOMEWHERE ELSE:
 % To not rely on the critic's own value estimates, we obtain $V$ from completed episodes, with $v_t =\sum^T_{\bar{t}=t}\gamma^{t - \bar{t}} r_t$.
 
-\textbf{Value information.} The second metric quantifies $\mut{Z}{V}$, the mutual information between $Z$ and state values. While a high $\mut{Z_C}{V}$ facilitates the minimisation of $\ell_V$ (\Cref{eq:LV_PPO}), we wish to understand whether increasing $\mut{Z_A}{V}$ is always desirable. In fact, we find an apparent contradiction on this matter in prior work:~\citet{PPG} and~\citet{KaixinPPG} report that value distillation into the actor's representation (which implies a high $\mut{Z_A}{V}$) improves sample efficiency and generalisation of coupled and decoupled PPG agents, whereas~\citet{raileanu2021decoupling} and~\citet{Garcin2024DREDZT} report a positive correlation between generalisation and a high $\ell_V$ for coupled PPO agents (which implies a low $\mut{Z_A}{V}$). %In this work, we provide a more conclusive analysis on the relationship between $\mut{Z}{L}$ and $\mut{Z}{V}$.
+\textbf{Value information.} The second metric quantifies $\mut{Z}{V}$, the mutual information between $Z$ and state values. While a high $\mut{Z_C}{V}$ facilitates the minimisation of $\ell_V$ (\Cref{c2:eq:LV_PPO}), we wish to understand whether increasing $\mut{Z_A}{V}$ is always desirable. In fact, we find an apparent contradiction on this matter in prior work:~\citet{PPG} and~\citet{KaixinPPG} report that value distillation into the actor's representation (which implies a high $\mut{Z_A}{V}$) improves sample efficiency and generalisation of coupled and decoupled PPG agents, whereas~\citet{raileanu2021decoupling} and~\citet{garcin2024dred} report a positive correlation between generalisation and a high $\ell_V$ for coupled PPO agents (which implies a low $\mut{Z_A}{V}$). %In this work, we provide a more conclusive analysis on the relationship between $\mut{Z}{L}$ and $\mut{Z}{V}$.
 
-\textbf{Dynamics in the latent space.} The remaining two metrics investigate the transition dynamics $\mathcal{T}_z : \sZ \times \sA \rightarrow \mathscr{P}(\sZ)$ within the latent state space $\sZ$ spanned by the representation. We will see in later sections that the \textit{reduced MDP} $(\sZ,\sA,\mathcal{T}_z, R_z, \gamma)$ spanned by the actor or critic's representation tend to have distinct $\mathcal{T}_z$, which often markedly differ from the transition dynamics $\mathcal{T}$ in the original environment. $\mut{Z}{Z'}$ measures how easy it is to differentiate a latent pair $( \phi(o),\phi(o'))$ obtained from consecutive observations from a latent pair obtained from non-consecutive observations. $\mut{(Z,Z')}{A}$ quantifies how easy it is to predict the action taken during transition $\langle o, a, o' \rangle$ given the pair $( \phi(o),\phi(o'))$. In \Cref{th:markov_mi}, we establish that $\mathcal{T}_z$ maintains the \textit{Markov property} of the original MDP when both of these metrics attain their theoretical maximum.\footnote{The Markov property is satisfied for a MDP $(\sZ,\sA,\mathcal{T}_z, R_z, \gamma)$ if and only if $\mathcal{T}_z^{(k)}(z_{t+1}|\{a_{t-i},z_{t-i}\}^k_{i=0})=\mathcal{T}_z(z_{t+1}|a_{t},z_{t})$ and $R_z^{(k)}(z_{t+1}|\{a_{t-i},z_{t-i}\}^k_{i=0})=R_z(z_{t+1}|a_{t},z_{t}), \forall a\in\sA, z\in\sZ, k \geq 1.$ 
+\textbf{Dynamics in the latent space.} The remaining two metrics investigate the transition dynamics $\mathcal{T}_z : \sZ \times \sA \rightarrow \mathscr{P}(\sZ)$ within the latent state space $\sZ$ spanned by the representation. We will see in later sections that the \textit{reduced MDP} $(\sZ,\sA,\mathcal{T}_z, R_z, \gamma)$ spanned by the actor or critic's representation tend to have distinct $\mathcal{T}_z$, which often markedly differ from the transition dynamics $\mathcal{T}$ in the original environment. $\mut{Z}{Z'}$ measures how easy it is to differentiate a latent pair $( \phi(o),\phi(o'))$ obtained from consecutive observations from a latent pair obtained from non-consecutive observations. $\mut{(Z,Z')}{A}$ quantifies how easy it is to predict the action taken during transition $\langle o, a, o' \rangle$ given the pair $( \phi(o),\phi(o'))$. In \Cref{c2:th:markov_mi}, we establish that $\mathcal{T}_z$ maintains the \textit{Markov property} of the original MDP when both of these metrics attain their theoretical maximum.\footnote{The Markov property is satisfied for a MDP $(\sZ,\sA,\mathcal{T}_z, R_z, \gamma)$ if and only if $\mathcal{T}_z^{(k)}(z_{t+1}|\{a_{t-i},z_{t-i}\}^k_{i=0})=\mathcal{T}_z(z_{t+1}|a_{t},z_{t})$ and $R_z^{(k)}(z_{t+1}|\{a_{t-i},z_{t-i}\}^k_{i=0})=R_z(z_{t+1}|a_{t},z_{t}), \forall a\in\sA, z\in\sZ, k \geq 1.$ 
  }
-\begin{restatable}{theorem}{THmarkovmi}\label{th:markov_mi}
+\begin{restatable}{theorem}{THmarkovmi}\label{c2:th:markov_mi}
  if $\mathcal{T} : \sX \times \sA \rightarrow \mathscr{P}(\sX)$ satisfies the Markov property, and we have $\mut{(X,X')}{A}=\mut{(Z,Z')}{A}$ and $\mut{X}{X'}=\mut{Z}{Z'}$ for any $X,X',A,Z,Z'$ collected using policy $\pi$, then $\mathcal{T}_z : \sZ \times \sA \rightarrow \mathscr{P}(\sZ)$ satisfies the Markov property when following $\pi$. $\mathcal{T}_z$ always satisfies the Markov property if the above conditions hold for any $\pi$.
 \end{restatable}
-Given that $\phi$ only induces $\mathcal{T}_z$ for the current $\pi$ in the on-policy setting, we make the distinction between $\mathcal{T}_z$ being Markov when following $\pi$ and the more general notion of $\mathcal{T}_z$ being Markov when following any policy. Crucially, \Cref{th:markov_mi} generalises the equivalence relations obtained by \citet{markov_z} to continuous metrics. As such, $\mut{(Z,Z')}{A}$ and $\mut{Z}{Z'}$ quantify how close \textit{any} $\phi$ comes to have $\mathcal{T}_z$ satisfy the Markov property. They remain applicable in settings in which it isn't practical (or even possible) for $\mathcal{T}_z$ to satisfy the Markov property, e.g. when $\phi$ has finite capacity and bottlenecks how much information can be extracted from raw observations, or when observations are not Markov.\footnote{In contrast, \citet{markov_z} assume observations are always Markov.}  
+Given that $\phi$ only induces $\mathcal{T}_z$ for the current $\pi$ in the on-policy setting, we make the distinction between $\mathcal{T}_z$ being Markov when following $\pi$ and the more general notion of $\mathcal{T}_z$ being Markov when following any policy. Crucially, \Cref{c2:th:markov_mi} generalises the equivalence relations obtained by \citet{markov_z} to continuous metrics. As such, $\mut{(Z,Z')}{A}$ and $\mut{Z}{Z'}$ quantify how close \textit{any} $\phi$ comes to have $\mathcal{T}_z$ satisfy the Markov property. They remain applicable in settings in which it isn't practical (or even possible) for $\mathcal{T}_z$ to satisfy the Markov property, e.g. when $\phi$ has finite capacity and bottlenecks how much information can be extracted from raw observations, or when observations are not Markov.\footnote{In contrast, \citet{markov_z} assume observations are always Markov.}  
 %
-\section{Information specialisation in actor and critic representations}\label{sec:specialization-theory}
+\section{Information specialisation in actor and critic representations}\label{c2:sec:specialization-theory}
 %
 \citet{raileanu2021decoupling, PPG} have attributed the performance improvements obtained from decoupled architectures to the disappearance of gradient interference between the actor and critic, and to the critic tolerating a higher degree of sample reuse than the actor before overfitting. We propose a different interpretation: given their different learning objectives, the actor's and critic's \textit{optimal representations} (defined below) prioritise different types of information from the environment.
 While not incompatible with prior interpretations, our claim is stronger. We posit that an optimal (or near-optimal) representation for both the actor and critic will generally be impossible under a shared architecture.
@@ -308,9 +200,9 @@ Given the model $m \triangleq f_{\vomega} \circ \phi$ and associated loss $\ell_
 %
 \begin{figure}
 \includegraphics[width=1\linewidth]{figs/working_example/deac_toy_example-toy_example_fig.pdf}
-    \caption{(Top) the initial observations and state spaces of three levels from the assembly line environment in \S\ref{sec:specialization-theory}. (Bottom) the reduced MDPs spanned by $\phi^*_A$ and $\phi^*_C$.}\label{fig:toy_ex}
+    \caption{(Top) the initial observations and state spaces of three levels from the assembly line environment in \S\ref{c2:sec:specialization-theory}. (Bottom) the reduced MDPs spanned by $\phi^*_A$ and $\phi^*_C$.}\label{c2:fig:toy_ex}
 \end{figure}
-We will provide theoretical insights on the respective specialisations and mutual incompatibility of $\phi^*_A$ and $\phi^*_C$, which we further highlight through a motivating example. In our example, depicted in \Cref{fig:toy_ex}, the agent inspects parts for defects on an assembly line. The agent is trained on a set $L$ of levels drawn from $P(\rc)$. A level is characterised by a particular combination of part specifications, number and ordering, each part having a probability $\pf$ of being defective. At each timestep, the agent observes the part specifications for the current level, which parts are on the assembly line and which part is up for inspection. The agent picks action $a \in \sA = \{a_0=\textit{accept}, a_1=\textit{reject}\}$ and moves to the next part. It receives a reward $R=r_+$ when correctly accepting/rejecting a good/defective part and $R=r_\minus$ when it makes a mistake, with $r_+>r_\minus$. The episode terminates early when the agent accepts a defective part, otherwise it terminates after $N_c$ timesteps, where $N_c$ is the number of parts in level $c\in L$.
+We will provide theoretical insights on the respective specialisations and mutual incompatibility of $\phi^*_A$ and $\phi^*_C$, which we further highlight through a motivating example. In our example, depicted in \Cref{c2:fig:toy_ex}, the agent inspects parts for defects on an assembly line. The agent is trained on a set $L$ of levels drawn from $P(\rc)$. A level is characterised by a particular combination of part specifications, number and ordering, each part having a probability $\pf$ of being defective. At each timestep, the agent observes the part specifications for the current level, which parts are on the assembly line and which part is up for inspection. The agent picks action $a \in \sA = \{a_0=\textit{accept}, a_1=\textit{reject}\}$ and moves to the next part. It receives a reward $R=r_+$ when correctly accepting/rejecting a good/defective part and $R=r_\minus$ when it makes a mistake, with $r_+>r_\minus$. The episode terminates early when the agent accepts a defective part, otherwise it terminates after $N_c$ timesteps, where $N_c$ is the number of parts in level $c\in L$.
 %
 \subsection{The actor's optimal representation}
 %
@@ -324,15 +216,15 @@ The combinatorial explosion of possible specifications and part assortments mean
       \zao_1, & \text{if}\ a^*=a_1.
     \end{cases}
 \end{equation}
-satisfies the conditions for being an optimal representation, and spans the reduced MDP in \Cref{fig:toy_ex} (bottom left). This reduced MDP describes the perceived environment dynamics when only observing the latent states in $\sZao$. By construction, $\mut{(\Zao, \Zao')}{A}$ is guaranteed to be maximised when following the optimal policy. We note that, even if $\mut{X}{X'}$ is maximised under $\pi^*$ in the original environment, we have $\mut{\Zao}{\Zao'}=0$ in the reduced MDP. In other words, the current reduced state yields no information about the next reduced state, and vice versa.
+satisfies the conditions for being an optimal representation, and spans the reduced MDP in \Cref{c2:fig:toy_ex} (bottom left). This reduced MDP describes the perceived environment dynamics when only observing the latent states in $\sZao$. By construction, $\mut{(\Zao, \Zao')}{A}$ is guaranteed to be maximised when following the optimal policy. We note that, even if $\mut{X}{X'}$ is maximised under $\pi^*$ in the original environment, we have $\mut{\Zao}{\Zao'}=0$ in the reduced MDP. In other words, the current reduced state yields no information about the next reduced state, and vice versa.
 %TODO: appendix?
-%, \Cref{rem:Izza_actor} and in our example $\entropy(A^*)$ depends only on $\pf$.
-%\begin{remark}\label{rem:Izza_actor}
+%, \Cref{c2:rem:Izza_actor} and in our example $\entropy(A^*)$ depends only on $\pf$.
+%\begin{remark}\label{c2:rem:Izza_actor}
  % When $\Zao$ and $A$ are collected using the optimal policy, $\entropy(A|\Zao)=0$ and $\mut{(\Zao, \Zao')}{A}$ is maximised up to $\entropy (A)$.
 %\end{remark}
 
-\textbf{Overfitting to training levels.} In our assembly line example, an \textit{overfit} $\phi_A$ with high $\mut{Z_A}{L}$ may leverage this information to first identify, and then solve certain levels. This overfit $\phi_A$ may be optimal over $L$, but would be heavily biased to the training set, and fail to generalise to unseen levels that do not satisfy certain spurious correlations. For example: ``\textit{if there are three objects on the line then I must be in level 1, and, in level 1, I should reject the triangle}''. In contrast, a representation that is \textit{invariant} to individual levels, i.e. with $\mut{Z_A}{L}=0$, guarantees zero generalisation error under \Cref{th:genbound}. Nevertheless, achieving $\mut{Z_A}{L}=0$ is not achievable under certain conditions, stated in \Cref{lem:miZL_cond}.
-\begin{restatable}{lemma}{LEMmiZLcond}\label{lem:miZL_cond}
+\textbf{Overfitting to training levels.} In our assembly line example, an \textit{overfit} $\phi_A$ with high $\mut{Z_A}{L}$ may leverage this information to first identify, and then solve certain levels. This overfit $\phi_A$ may be optimal over $L$, but would be heavily biased to the training set, and fail to generalise to unseen levels that do not satisfy certain spurious correlations. For example: ``\textit{if there are three objects on the line then I must be in level 1, and, in level 1, I should reject the triangle}''. In contrast, a representation that is \textit{invariant} to individual levels, i.e. with $\mut{Z_A}{L}=0$, guarantees zero generalisation error under \Cref{c2:th:genbound}. Nevertheless, achieving $\mut{Z_A}{L}=0$ is not achievable under certain conditions, stated in \Cref{c2:lem:miZL_cond}.
+\begin{restatable}{lemma}{LEMmiZLcond}\label{c2:lem:miZL_cond}
     $\mut{Z}{L} > 0$ if $\mut{O}{L} > 0$ and $\exists z_k,\lvl_j \in Z\times L$ such that $\mu(z_k|\lvl_j) \neq \mu(z_k)$.
 \end{restatable} In our example, $\mut{O}{L} > 0$, since a level can be identified from its observations. We can verify that the second condition holds for $\phi^*_A$ by inspecting the stationary distributions in a particular level $c$ and over all levels,
 \begin{equation}
@@ -350,14 +242,14 @@ satisfies the conditions for being an optimal representation, and spans the redu
     \end{cases}
 % \end{split}
 \end{equation}
-where $\bpf=1-\pf$ and $\pf_c$ is the defect probability when in level $c$. We may have $\pf \neq \pf_c$, since individual levels do not all have the same distribution of defective parts. In other words, while it is useful to reduce $\mut{Z_A}{L}$ to guard against overfitting, the optimal representation $\phi^*_A$ may carry some irreducible information about level identities.  %For example, being in $\zao_1$ makes it more likely to be in the second out of the three levels depicted in \Cref{fig:toy_ex}, since it is where $\mu({\zao_1})$ is the highest. %\footnote{Mathematical workings for obtaining relevant quantities in the toy example are included in \Cref{app:toy_ex_math}.}
+where $\bpf=1-\pf$ and $\pf_c$ is the defect probability when in level $c$. We may have $\pf \neq \pf_c$, since individual levels do not all have the same distribution of defective parts. In other words, while it is useful to reduce $\mut{Z_A}{L}$ to guard against overfitting, the optimal representation $\phi^*_A$ may carry some irreducible information about level identities.  %For example, being in $\zao_1$ makes it more likely to be in the second out of the three levels depicted in \Cref{c2:fig:toy_ex}, since it is where $\mu({\zao_1})$ is the highest. %\footnote{Mathematical workings for obtaining relevant quantities in the toy example are included in \Cref{c2:app:toy_ex_math}.}
 
 \textbf{Value and dynamics distillation can induce overfitting.} we can employ the chain rule of mutual information to decompose the information $\phi$ captures about some arbitrary quantity $Y$ as
 \begin{equation}
     \mut{Z}{Y} = \mut{Z}{Y|L} + \mut{Z}{L} - \mut{Z}{L|Y},
 \end{equation}
-where $\mut{Z}{Y|L}$ is the \textit{level-invariant} information encoded about $Y$, and $\mut{Z}{L} - \mut{Z}{L|Y}$ is the \textit{level-specific} information being encoded about $Y$. Thus, encouraging $\phi_A$ to capture extraneous information about state values or transition dynamics can cause $\mut{Z_A}{L}$ to increase and promote overfitting. In \Cref{lem:miZZ_and_ZL}, we show that increasing $\mut{Z_A}{V}$ or $\mut{Z_A}{Z'_A}$ (which is not necessary for obtaining an optimal $\phi^*_A$, as discussed above) can cause $\mut{Z_A}{L}$ to increase as well.
-\begin{restatable}{lemma}{LEMmiZZandZL}\label{lem:miZZ_and_ZL}
+where $\mut{Z}{Y|L}$ is the \textit{level-invariant} information encoded about $Y$, and $\mut{Z}{L} - \mut{Z}{L|Y}$ is the \textit{level-specific} information being encoded about $Y$. Thus, encouraging $\phi_A$ to capture extraneous information about state values or transition dynamics can cause $\mut{Z_A}{L}$ to increase and promote overfitting. In \Cref{c2:lem:miZZ_and_ZL}, we show that increasing $\mut{Z_A}{V}$ or $\mut{Z_A}{Z'_A}$ (which is not necessary for obtaining an optimal $\phi^*_A$, as discussed above) can cause $\mut{Z_A}{L}$ to increase as well.
+\begin{restatable}{lemma}{LEMmiZZandZL}\label{c2:lem:miZZ_and_ZL}
        $\mut{Z}{L}$ monotonically increases with a) $\mut{Z}{V}-\mut{Z}{V|L}$ and b) $\mut{Z}{Z'}-\mut{Z}{Z'|L}$.
     % \begin{equation*}
     %     \mut{Z}{Z'} = \mut{Z'}{L} + \mut{(Z,Z')}{L} > \max (\mut{Z}{L} + \mut{Z'}{L}, 2\mut{Z'}{L}),
@@ -367,8 +259,8 @@ where $\mut{Z}{Y|L}$ is the \textit{level-invariant} information encoded about $
 In fact, $\mut{Z}{L}$ will increase when $\mut{Z}{V}>\mut{Z}{V|L}$ (or when $\mut{Z}{Z'}>\mut{Z}{Z'|L}$), that is when the information encoded carries a level-specific component. In our example, the higher state values only occur in a subset of levels, since the optimal value for any given state depends on how many parts are left to inspect. State values therefore inherently contain level-specific information, and may induce overfitting if this information is captured by $\phi_A$. This challenges the notion that value distillation would systematically improve the actor's representation. 
 
 
-%For example, $\phi_A$ encoding that ``\textit{An object that comes after two spheres always has a defect}'' applies to the three levels in \Cref{fig:toy_ex}, but not to all possible levels. This means $\mut{Z}{L}$ must increase because $\mut{Z}{Z'}>\mut{Z}{Z'|L}$. Conversely, $\phi_A$ encoding that ``\textit{the arrow above the object will move to the right at the next timestep}'' would not increase $\mut{Z}{L}$, because, as this information applies to all levels, we have $\mut{Z}{Z'}=\mut{Z}{Z'|L}$.
-%In our example, the distributions of state values and latents share a confounder in the level identities: level 2 and 3 have more timesteps and $\pf_c$, leading to a skewed value distribution and higher $\mu(\zao_1)$, compared to level 1. \Cref{cor:miZV} formalises the correlation that gets established between $\mut{Z}{V}$ and $\mut{Z}{L}$ under this confounding effect.
+%For example, $\phi_A$ encoding that ``\textit{An object that comes after two spheres always has a defect}'' applies to the three levels in \Cref{c2:fig:toy_ex}, but not to all possible levels. This means $\mut{Z}{L}$ must increase because $\mut{Z}{Z'}>\mut{Z}{Z'|L}$. Conversely, $\phi_A$ encoding that ``\textit{the arrow above the object will move to the right at the next timestep}'' would not increase $\mut{Z}{L}$, because, as this information applies to all levels, we have $\mut{Z}{Z'}=\mut{Z}{Z'|L}$.
+%In our example, the distributions of state values and latents share a confounder in the level identities: level 2 and 3 have more timesteps and $\pf_c$, leading to a skewed value distribution and higher $\mu(\zao_1)$, compared to level 1. \Cref{c2:cor:miZV} formalises the correlation that gets established between $\mut{Z}{V}$ and $\mut{Z}{L}$ under this confounding effect.
 
 
  %We will show in the next section that forward dynamics information can induce overfitting. 
@@ -376,8 +268,8 @@ In fact, $\mut{Z}{L}$ will increase when $\mut{Z}{V}>\mut{Z}{V|L}$ (or when $\mu
 
 The key implications of the above are 1) While achieving zero $\mut{Z_A}{L}$ is not always possible, a high $\mut{Z_A}{L}$ implies $\phi_A$ is overfit; 2) Increasing $\mut{Z_A}{Z_A'}$ or $\mut{Z_A}{V}$ is not necessary for obtaining $\phi^*_A$, and will increase $\mut{Z_A}{L}$ if the information captured is level-specific.
 %
-\subsection{The critic's optimal representation}\label{sec:optimal-c}
-\textbf{$\phi^*_C$ has higher $\mut{Z}{L}$ than $\phi^*_A$.} The reduced MDP spanned by $\phi^*_C$ is depicted in \Cref{fig:toy_ex} (bottom right). In order to ensure perfect value prediction, $\phi^*_C$ maps each possible optimal state value to a different element in $\sZco$, and it maximises $\mut{\Zco}{V}$ by construction. $\mut{\Zco}{\Zco'}$ is also high due to the recurrence $V^\pi(x) = \E_{a\sim\pi} [R(x,a) + \gamma \E_{x'\sim P^\pi(x'|x)} [V^\pi(x')]]$. This points to $V^\pi$ being a quantity inherently more level specific than the optimal action for the current state, because $V^\pi$ encodes information pertaining to all possible future states of the current level. We should then expect that, in general, $\mut{\Zco}{L} > \mut{\Zao}{L}$, implying that decoupling the actor and critic helps with $\mut{Z_A}{L}$ regularisation.%In \Cref{fig:toy_ex}, higher values are skewed to occur in level 2 and 3 because they have two more timesteps than level 1.
+\subsection{The critic's optimal representation}\label{c2:sec:optimal-c}
+\textbf{$\phi^*_C$ has higher $\mut{Z}{L}$ than $\phi^*_A$.} The reduced MDP spanned by $\phi^*_C$ is depicted in \Cref{c2:fig:toy_ex} (bottom right). In order to ensure perfect value prediction, $\phi^*_C$ maps each possible optimal state value to a different element in $\sZco$, and it maximises $\mut{\Zco}{V}$ by construction. $\mut{\Zco}{\Zco'}$ is also high due to the recurrence $V^\pi(x) = \E_{a\sim\pi} [R(x,a) + \gamma \E_{x'\sim P^\pi(x'|x)} [V^\pi(x')]]$. This points to $V^\pi$ being a quantity inherently more level specific than the optimal action for the current state, because $V^\pi$ encodes information pertaining to all possible future states of the current level. We should then expect that, in general, $\mut{\Zco}{L} > \mut{\Zao}{L}$, implying that decoupling the actor and critic helps with $\mut{Z_A}{L}$ regularisation.%In \Cref{c2:fig:toy_ex}, higher values are skewed to occur in level 2 and 3 because they have two more timesteps than level 1.
 % Under stochastic dynamics, $\mut{\Zco}{\Zco'}$ is high when $\entropy (\zco'|\zco)\ll \entropy(\zco')$, which is usually the case. 
 
 \textbf{$\phi^*_C$ is not compatible with $\pi^*$.} Paradoxically, while $\phi^*_C$ would necessitate trajectories collected using the optimal policy in order to be learnt, in our example it is not possible to have an optimal policy that only depends on $\zco$. The information contained in $\zco$ is not sufficient for picking the optimal action in any given timestep, and therefore the best response is to always pick $a_1$ in order to prevent early termination. Therefore, in addition to the information prioritised by $\phi^*_C$ being in general irrelevant to $\pi^*$, employing a shared $\phi$ with a finite capacity may prevent extracting the necessary information to execute the optimal policy.
@@ -389,47 +281,38 @@ The key implications of the above are 1) While achieving zero $\mut{Z_A}{L}$ is 
     \includegraphics[width=1\linewidth]{figs/procgen_stacked_ZandO.pdf}
     \end{subfigure}
     \end{center}
-    \caption{Mean and 95\% confidence interval aggregates of $I(Z;\cdot)$/$I(O;\cdot)$ (top/bottom rows) in Procgen. Gray bars indicate $I(Z;\cdot)$/$I(O;\cdot)$ for a shared $\phi$.  Blue and orange bars indicate $I(Z;\cdot)$ measured for $\phi_A$ and $\phi_C$ when employing a decoupled architecture. Pink bars indicate $I(O;\cdot)$ measured when using a decoupled architecture. X-axes are shared across top and bottom. For all algorithms, decoupling induces specialisation consistent with \S\ref{sec:specialization-theory}.}
-    \label{fig:shdec-spec-obs-comp}
+    \caption{Mean and 95\% confidence interval aggregates of $I(Z;\cdot)$/$I(O;\cdot)$ (top/bottom rows) in Procgen. Gray bars indicate $I(Z;\cdot)$/$I(O;\cdot)$ for a shared $\phi$.  Blue and orange bars indicate $I(Z;\cdot)$ measured for $\phi_A$ and $\phi_C$ when employing a decoupled architecture. Pink bars indicate $I(O;\cdot)$ measured when using a decoupled architecture. X-axes are shared across top and bottom. For all algorithms, decoupling induces specialisation consistent with \S\ref{c2:sec:specialization-theory}.}
+    \label{c2:fig:shdec-spec-obs-comp}
 \end{figure}
 %
 \subsection{Confirming specialisation empirically}
 %
-\begin{wrapfigure}[]{r}{0.34\textwidth}
-% \vspace{-1cm}
+% wrapfigure unwrapped to a normal float (original wrap width 0.34\textwidth).
+\begin{figure}[t]
     \centering
-    % \begin{subfigure}[]{1\linewidth}
-    \vspace{-2.cm}
-    \includegraphics[width=1\linewidth]{figs/procgen_scaling_1.pdf}
-    % \caption{Coupled actor-critic architecture}
-    % \end{subfigure}
-    % \begin{subfigure}[]{1\linewidth}
-    % \includegraphics[width=1\linewidth]{figs/decoupled_arch-cropped.pdf}
-    % % \caption{Decoupled actor-critic architecture}
-    % \end{subfigure}
-    \caption{Effect of parameter scaling in coupled (blue) and decoupled (orange) PPO. Scores normalized by model performance at 0.6M parameters.}\label{fig:param-efficiency}
-    \vspace{-0.6cm}
-\end{wrapfigure}
+    \includegraphics[width=0.34\textwidth]{figs/procgen_scaling_1.pdf}
+    \caption{Effect of parameter scaling in coupled (blue) and decoupled (orange) PPO. Scores normalized by model performance at 0.6M parameters.}\label{c2:fig:param-efficiency}
+\end{figure}
 %
-We conclude this section by studying the representations learned by PPO \citep{PPO}, PPG \citep{PPG} and DCPG \citep{DCPG}, a close variant of PPG that employs delayed value targets to train the critic and for value distillation. We evaluate all algorithms with and without decoupling their representation. We conduct our experiments in Procgen \citep{procgen}, a benchmark of 16 games designed to measure generalisation in RL. We report our main observations in below, with extended results and details on our methodology included in \Cref{app:results_procgen}.
+We conclude this section by studying the representations learned by PPO \citep{PPO}, PPG \citep{PPG} and DCPG \citep{DCPG}, a close variant of PPG that employs delayed value targets to train the critic and for value distillation. We evaluate all algorithms with and without decoupling their representation. We conduct our experiments in Procgen \citep{procgen}, a benchmark of 16 games designed to measure generalisation in RL. We report our main observations in below, with extended results and details on our methodology included in \Cref{c2:app:results_procgen}.
 
-\textbf{Specialisation is consistent with $\phi^*_A$ and $\phi^*_C$.} As no algorithm achieves optimal scores in all games, we now consider the suboptimal representations $\phi_A$ and $\phi_C$ realistically obtainable by the end of training. In \Cref{fig:shdec-spec-obs-comp}, we observe clear specialization upon decoupling consistent with the properties we expect for $\phi^*_A$ and $\phi^*_C$. $\phi_C$ has high $\mut{Z}{V}$, $\mut{Z}{Z'}$ and $\mut{Z}{L}$, while $\phi_A$ specializes in $\mut{(Z,Z')}{A}$ .
+\textbf{Specialisation is consistent with $\phi^*_A$ and $\phi^*_C$.} As no algorithm achieves optimal scores in all games, we now consider the suboptimal representations $\phi_A$ and $\phi_C$ realistically obtainable by the end of training. In \Cref{c2:fig:shdec-spec-obs-comp}, we observe clear specialization upon decoupling consistent with the properties we expect for $\phi^*_A$ and $\phi^*_C$. $\phi_C$ has high $\mut{Z}{V}$, $\mut{Z}{Z'}$ and $\mut{Z}{L}$, while $\phi_A$ specializes in $\mut{(Z,Z')}{A}$ .
 
-\textbf{Decoupling is more parameter efficient.} Since decoupled representations fit twice as many parameters, it is fair to wonder whether the performance improvements are mainly caused by the increased model capacity. To test this, we measure performance as we scale model size in a shared and a decoupled architecture in \Cref{fig:param-efficiency}. Surprisingly, the decoupled model turns out to be \textit{more} parameter efficient, and still outperforms a shared model with four times its parameter count.
+\textbf{Decoupling is more parameter efficient.} Since decoupled representations fit twice as many parameters, it is fair to wonder whether the performance improvements are mainly caused by the increased model capacity. To test this, we measure performance as we scale model size in a shared and a decoupled architecture in \Cref{c2:fig:param-efficiency}. Surprisingly, the decoupled model turns out to be \textit{more} parameter efficient, and still outperforms a shared model with four times its parameter count.
 
 \textbf{On Markov representations.}
-According to \Cref{th:markov_mi}, a representation is considered Markov when both $\mut{(Z,Z')}{A}$ and $\mut{Z}{Z'}$ are maximized. However, our observations reveal an interesting pattern during decoupling: the actor representation shows an increase in $\mut{(Z_A,Z_A')}{A}$ but a decrease in $\mut{Z_A}{Z_A'}$, while the critic representation shows the opposite effect - a decrease in $\mut{(Z_C,Z_C')}{A}$ and an increase in $\mut{Z_C}{Z_C'}$. This divergent behavior suggests that neither the actor nor the critic networks inherently benefit from maintaining a Markov representation. This finding aligns with theoretical expectations, as neither $\phi_A$ nor $\phi_C$ need be Markov to be optimal. Furthermore, we found no significant correlation between the sum of these mutual information terms ($\mut{(Z,Z')}{A} + \mut{Z}{Z'}$) and agent performance, as shown by comparing \Cref{fig:mi_sum_markov} and \Cref{fig:complete-returns}.
+According to \Cref{c2:th:markov_mi}, a representation is considered Markov when both $\mut{(Z,Z')}{A}$ and $\mut{Z}{Z'}$ are maximized. However, our observations reveal an interesting pattern during decoupling: the actor representation shows an increase in $\mut{(Z_A,Z_A')}{A}$ but a decrease in $\mut{Z_A}{Z_A'}$, while the critic representation shows the opposite effect - a decrease in $\mut{(Z_C,Z_C')}{A}$ and an increase in $\mut{Z_C}{Z_C'}$. This divergent behavior suggests that neither the actor nor the critic networks inherently benefit from maintaining a Markov representation. This finding aligns with theoretical expectations, as neither $\phi_A$ nor $\phi_C$ need be Markov to be optimal. Furthermore, we found no significant correlation between the sum of these mutual information terms ($\mut{(Z,Z')}{A} + \mut{Z}{Z'}$) and agent performance, as shown by comparing \Cref{c2:fig:mi_sum_markov} and \Cref{c2:fig:complete-returns}.
 %
 \section{Representation learning for the actor}
 %
-In this section, we study how different representation learning objectives affect $\phi_A$ in PPO, PPG and DCPG. We consider advantage \citep{raileanu2021decoupling} and dynamics \citep{DCPG} prediction, data augmentation \citep{raileanu2021UCB-DrAC} and MICo \citep{MICo}, an objective explicitly shaping the latent space to embed differences in state values. We study these objectives in Procgen (\Cref{fig:rep_actor_procgen}), and in four continuous control environments with video distractors \citep{mcinroe2025pixelbrax}(\Cref{fig:brax_all_mi}). 
+In this section, we study how different representation learning objectives affect $\phi_A$ in PPO, PPG and DCPG. We consider advantage \citep{raileanu2021decoupling} and dynamics \citep{DCPG} prediction, data augmentation \citep{raileanu2021UCB-DrAC} and MICo \citep{MICo}, an objective explicitly shaping the latent space to embed differences in state values. We study these objectives in Procgen (\Cref{c2:fig:rep_actor_procgen}), and in four continuous control environments with video distractors \citep{mcinroe2025pixelbrax}(\Cref{c2:fig:brax_all_mi}). 
 % TODO: replace fig 5 in main text by new table incorporating brax and procgen information changes. move fig 5 to appendix.
 % TODO: in appendix describe each objective further
 
 \textbf{Representation learning impacts information specialisation.} As expected, applying auxiliary tasks alters what information is extracted by the representation. Dynamics prediction generally enhances the specialization of $\phi_A$ by increasing $\mut{(Z,Z')}{A}$ while reducing the three other quantities. Conversely, MICo produces the opposite effect - in most cases, it increases $\mut{Z}{Z'}$, $\mut{Z}{V}$, and $\mut{Z}{L}$ at the expense of $\mut{(Z,Z')}{A}$. The effects of the last two objectives are not as clear-cut. Data augmentation produces little change in each quantity, while advantage prediction tends to reduce the measured mutual information, but is inconsistent in the quantities it affects. Performance-wise, data augmentation improves train and test scores for all algorithms; dynamics prediction tends to improve performance for PPG and DCPG; MICo generally decreases performance, and advantage prediction makes no noticeable impact. Based on these findings, we find advisable to not use objectives increasing $\mut{Z_A}{L}$ or playing directly against the specialisation of $\phi_A$.
 
 %TODO: update fig ref
-\textbf{On the importance of the batch size and data diversity.} We now turn our attention to an apparent contradiction in the relationship between value distillation and performance. Decoupling PPO, and thus completely forgoing value distillation, leads to improved train and test scores (\Cref{fig:complete-returns}). However, PPG and DCPG perform extensive value distillation (four times as many distillation updates as coupled PPO in our experiments), and achieve significant performance improvements. Crucially, conducting value distillation every $N_\pi$ policy phases ensures the batch size $B_\text{aux}$ is $N_\pi$ times larger than the PPO batch size, greatly increasing its data diversity. \citet{KaixinPPG} report that increasing diversity is a key driver of performance improvement at equal number of gradient updates. We reproduce their experiment in \Cref{fig:PPGvalue_dist}, while also tracking the evolution of $\mut{Z_A}{L}$ and $\mut{Z_A}{V}$ as $B_\text{aux}$ increases. We find that the increase in $\mut{Z_A}{L}$ in PPG is mainly caused by these additional gradient updates, whereas agent performance and $\mut{Z_A}{V}$ only increase when performing value distillation over large, diverse training batches. Increasing data diversity should promote level-invariant state value information to be distilled into $\phi_A$, and we conclude that it is this level invariant information plays a key role in improving agent performance in PPG and DCPG.
+\textbf{On the importance of the batch size and data diversity.} We now turn our attention to an apparent contradiction in the relationship between value distillation and performance. Decoupling PPO, and thus completely forgoing value distillation, leads to improved train and test scores (\Cref{c2:fig:complete-returns}). However, PPG and DCPG perform extensive value distillation (four times as many distillation updates as coupled PPO in our experiments), and achieve significant performance improvements. Crucially, conducting value distillation every $N_\pi$ policy phases ensures the batch size $B_\text{aux}$ is $N_\pi$ times larger than the PPO batch size, greatly increasing its data diversity. \citet{KaixinPPG} report that increasing diversity is a key driver of performance improvement at equal number of gradient updates. We reproduce their experiment in \Cref{c2:fig:PPGvalue_dist}, while also tracking the evolution of $\mut{Z_A}{L}$ and $\mut{Z_A}{V}$ as $B_\text{aux}$ increases. We find that the increase in $\mut{Z_A}{L}$ in PPG is mainly caused by these additional gradient updates, whereas agent performance and $\mut{Z_A}{V}$ only increase when performing value distillation over large, diverse training batches. Increasing data diversity should promote level-invariant state value information to be distilled into $\phi_A$, and we conclude that it is this level invariant information plays a key role in improving agent performance in PPG and DCPG.
 
 Our experiments further reveal that dynamics prediction yields significant performance improvements, but only when applied to algorithms with large batch sizes (specifically in PPG and DCPG, not in PPO). In comparison, data augmentation, which increases data diversity, demonstrates performance benefits across all three algorithms. These findings suggest an important hypothesis: the actor benefits more from encouraging $\phi_A$ to extract level-invariant information about \textit{any} arbitrary quantity $Y$, rather than from specifically choosing what that quantity $Y$ should be (such as state values or dynamics).
 \begin{figure}[!t]
@@ -452,32 +335,32 @@ Our experiments further reveal that dynamics prediction yields significant perfo
     
     % Mutual information measurements for actor (non-hashed intervals) and critic (hashed intervals) representations obtained with MICo, advantage distillation (Adv), and dynamics prediction (D) objectives applied to the actor (A) and the critic (C) of decoupled PPO and DCPG. Objectives applied to (C) will bias the policy to collect data relevant to their optimisation (MICo(C) increases $\mut{O}{V}$ and D(C) increases $\mut{(O,O')}{A}$. They also further the actor and critic's respective specialisations (bottom row).
     % }
-    \label{fig:rep_actor_procgen}
+    \label{c2:fig:rep_actor_procgen}
 %
 \end{figure}
 \section{The critic's objective influences data collection}
 %
-We now consider how the same set of representation learning objectives affect the critic's representation and present our results in \Cref{fig:critic_objs,fig:brax_all_mi}. The effect of a given objective on the information extracted by $\phi_C$ is consistent with how they would have affected $\phi_A$ in the previous section. However, we report two surprising findings: a) Without conducting any value distillation, decoupled PPO has a 37\% higher $\mut{Z_A}{V}$ than shared PPO (\Cref{tab:1}), and b) the information specialisation of $\phi_C$ incurred by applying an objective on the critic is often observed in $\phi_A$, albeit to a lesser extent. Given that the two representations are decoupled, how can an objective applied to $\phi_C$ affect $\phi_A$?
+We now consider how the same set of representation learning objectives affect the critic's representation and present our results in \Cref{c2:fig:critic_objs,c2:fig:brax_all_mi}. The effect of a given objective on the information extracted by $\phi_C$ is consistent with how they would have affected $\phi_A$ in the previous section. However, we report two surprising findings: a) Without conducting any value distillation, decoupled PPO has a 37\% higher $\mut{Z_A}{V}$ than shared PPO (\Cref{c2:tab:1}), and b) the information specialisation of $\phi_C$ incurred by applying an objective on the critic is often observed in $\phi_A$, albeit to a lesser extent. Given that the two representations are decoupled, how can an objective applied to $\phi_C$ affect $\phi_A$?
 
-As we maintain different optimisers for the actor and critic, their only remaining interaction in decoupled PPO is through $J_\pi$ (\Cref{eq:J_PPO}): $\hat{A}_t$ being computed from the critic's value estimates. Therefore, at least one of the following hypothesis must hold:
+As we maintain different optimisers for the actor and critic, their only remaining interaction in decoupled PPO is through $J_\pi$ (\Cref{c2:eq:J_PPO}): $\hat{A}_t$ being computed from the critic's value estimates. Therefore, at least one of the following hypothesis must hold:
 \begin{enumerate}[leftmargin=*]
 \item \textbf{Data collection bias.} Through $J^\pi$ updates, the critic biases $\pi$ to collect trajectories containing information relevant to its own learning objective. This information could then leak through $\phi_A$ because more of this information is contained in its input. In this scenario, it is not necessary for $\phi_A$ to become more proficient at extracting critic-relevant information. 
 
 \item \textbf{Implicit knowledge transfer.} The advantage targets in $J^\pi$ induce information transfer between $\phi_C$ and $\phi_A$ when applying the gradients $\nabla_{\vtheta_A}J^\pi$. Here, $\phi_A$ becomes proficient at extracting the same information $\phi_C$ extracts.
 \end{enumerate}
 
-The first hypothesis broadly holds in our experiments: in most cases, applying MICo to the critic increases $\mut{O}{V}$ and $\mut{O}{O'}$, and applying dynamics prediction increases $\mut{(O,O')}{A}$\footnote{In contrast, \mut{O}{L} does not vary significantly, given that the policy does not control which level is played in an episode.}. Furthermore, $\mut{O}{V}$ increases when PPO is decoupled (\Cref{fig:shdec-spec-obs-comp}). Without the critic's influence, there would be no direct incentive for the actor to collect data that contains value information, since no value distillation is taking place. 
+The first hypothesis broadly holds in our experiments: in most cases, applying MICo to the critic increases $\mut{O}{V}$ and $\mut{O}{O'}$, and applying dynamics prediction increases $\mut{(O,O')}{A}$\footnote{In contrast, \mut{O}{L} does not vary significantly, given that the policy does not control which level is played in an episode.}. Furthermore, $\mut{O}{V}$ increases when PPO is decoupled (\Cref{c2:fig:shdec-spec-obs-comp}). Without the critic's influence, there would be no direct incentive for the actor to collect data that contains value information, since no value distillation is taking place. 
 
 To test the second hypothesis, we measure the \textit{compression efficiency}, applicable whenever $\mut{O}{\cdot}>0$, and defined as
-\begin{equation}\label{eqn:compression-eff}
+\begin{equation}\label{c2:eqn:compression-eff}
 \comp{Z}{\cdot} = \min\bigg(\frac{\mut{Z}{\cdot}}{\mut{O}{\cdot}}, 1\bigg).
 \end{equation}
-For example, $\comp{Z_A}{V}$ measures the fraction of available information in $\mut{O}{V}$ that is extracted by $\phi_A$.\footnote{By the data processing inequality we must have $\mut{O}{\cdot}\geq\mut{Z}{\cdot}$, and $\comp{Z}{\cdot}$ cannot be larger than 1. We enforce this upper bound as our estimator sometimes underestimates $\mut{O}{\cdot}$ for high dimensional observations.} In \Cref{tab:decoupled-C,tab:actor-C}, we report that $\comp{Z_A}{V}$ does not signficantly change between PPO[sh] and decoupled PPO, or when MICo is applied to the critic in decoupled PPO. This result appears to disprove the second hypothesis, at least in PPO. We cannot formally confirm whether implicit knowledge transfer occurs for PPG and DCPG, as explicit knowledge transfer already occurs through value distillation.
+For example, $\comp{Z_A}{V}$ measures the fraction of available information in $\mut{O}{V}$ that is extracted by $\phi_A$.\footnote{By the data processing inequality we must have $\mut{O}{\cdot}\geq\mut{Z}{\cdot}$, and $\comp{Z}{\cdot}$ cannot be larger than 1. We enforce this upper bound as our estimator sometimes underestimates $\mut{O}{\cdot}$ for high dimensional observations.} In \Cref{c2:tab:decoupled-C,c2:tab:actor-C}, we report that $\comp{Z_A}{V}$ does not signficantly change between PPO[sh] and decoupled PPO, or when MICo is applied to the critic in decoupled PPO. This result appears to disprove the second hypothesis, at least in PPO. We cannot formally confirm whether implicit knowledge transfer occurs for PPG and DCPG, as explicit knowledge transfer already occurs through value distillation.
 
-Finally, we highlight that this data collection bias generally leads to worse performance (\Cref{fig:complete-returns}). Interestingly, employing different representation learning objectives for the actor and the critic results in surprising interactions. Consider PPO in the Procgen setup: when applied separately, Adv(A) and MICo(C) have respectively a neutral and adverse effect on performance, the latter being caused by the data collection bias caused by the critic. When applied together, they exhibit a sharp performance gain, and bring $\mut{O}{V}$ down (\Cref{fig:procgen_all_miO}). This suggests that certain actor representation objectives could improve performance by cancelling the bias in data collection induced by the critic.
+Finally, we highlight that this data collection bias generally leads to worse performance (\Cref{c2:fig:complete-returns}). Interestingly, employing different representation learning objectives for the actor and the critic results in surprising interactions. Consider PPO in the Procgen setup: when applied separately, Adv(A) and MICo(C) have respectively a neutral and adverse effect on performance, the latter being caused by the data collection bias caused by the critic. When applied together, they exhibit a sharp performance gain, and bring $\mut{O}{V}$ down (\Cref{c2:fig:procgen_all_miO}). This suggests that certain actor representation objectives could improve performance by cancelling the bias in data collection induced by the critic.
 %
 \section{Related work}
-\textbf{Representation learning in RL.} Representation learning objectives  have been used in RL for a variety of reasons such as sample efficiency~\citep{original,deepmdp,rad,pisac,CURL}, planning~\citep{plan2explore,ptgood}, disentanglement~\citep{ted}, and generalisation~\citep{darla,darl}. Some works focus on designing metrics motivated by theoretical properties such as bisimulation metrics, pseudometrics, decompositions of MDP components, or successor features~\citep{bisim-original,proto-value,successor-feat,bisim-mdp,pse,MICo,ksme}.
+\textbf{Representation learning in RL.} Representation learning objectives  have been used in RL for a variety of reasons such as sample efficiency~\citep{original,deepmdp,RL_aug_data,pisac,CURL}, planning~\citep{plan2explore,ptgood}, disentanglement~\citep{dunion2023ted}, and generalisation~\citep{darla,darl}. Some works focus on designing metrics motivated by theoretical properties such as bisimulation metrics, pseudometrics, decompositions of MDP components, or successor features~\citep{Bisim2004,proto-value,successor-feat,castro2020scalable,PSM,MICo,ksme}.
 
 \textbf{Analysing representations in RL.} Despite the large body of research into representation learning objectives in RL, relatively little work has gone into understanding the learned representations themselves \citep{wang2024investigating}. Several works use linear probing to determine how well learned representations relate to environment or agent properties~\citep{supervise-thyself,belief-repr,anand2019unsupervised,reward-probing}. Other works analyse the learned representation functions via saliency maps which help visualise where an agent is ``paying attention''~\citep{saliency-worth,saliency-question,mhairiCMID}.
 %
@@ -489,7 +372,7 @@ We identify three important research directions to be tackled in future work: 1)
 %TODO: move to ccl in online RL, Future work could explore designing new exploration strategies and representation learning objectives based on these findings, and whether we observe similar specialisation and interplay outside of the online and on-policy setting, and under different network architectures.
 %
 \section*{Reproducibility Statement}
-Reproducibility can be challenging without access to the data generated during experiments. To assist with this, we will make all of our experimental data, including model checkpoints, logged data and the code for reproducing the figures in this paper openly available at \url{github.com/francelico/deac-rep}.
+Reproducibility can be challenging without access to the data generated during experiments. To assist with this, we will make all of our experimental data, including model checkpoints, logged data and the code for reproducing the figures in this paper openly available at \href{https://github.com/francelico/deac-rep}{github.com/francelico/deac-rep}.
 
 % \subsubsection*{Author Contributions}
 % If you'd like to, you may include  a section for author contributions as is done
@@ -500,10 +383,10 @@ Reproducibility can be challenging without access to the data generated during e
 % acknowledgments, including those to funding agencies, go at the end of the paper.
 
 
-\bibliography{basebibfile}
-\bibliographystyle{iclr2025_conference}
-
-\appendix
-\input{supplementary}
-
-\end{document}
+%% --- Appendix: rendered as per-chapter lettered sections (A, B, ...) ---
+\clearpage
+\begin{subappendices}
+\crefalias{section}{appendix}
+\crefalias{subsection}{appendix}
+\input{chapter2_deac/paper/supplementary}
+\end{subappendices}

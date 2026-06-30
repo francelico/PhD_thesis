@@ -73,11 +73,39 @@
 \hyphenpenalty=4000
 \bibhyphenpenalty=1000
 
+%%%% REDUCE OVERFULL LINES (text spilling into the margin)
+
+%% Because hyphenation is discouraged above (per the regulations), long words and
+%% long inline maths can otherwise overflow the right margin. Let TeX add a little
+%% extra inter-word stretch as a last resort -- this clears almost all overfull
+%% boxes without visibly loosening ordinary lines. (microtype, loaded in
+%% packages.tex, does most of the work via protrusion/expansion.)
+\setlength{\emergencystretch}{3em}
+
+%% Permit inline maths to line-break at relations (=, <, ...) and binary
+%% operators (+, -, ...). The TeX defaults (\relpenalty=500, \binoppenalty=700)
+%% effectively forbid this, so a long $...$ runs into the margin instead of
+%% wrapping; these lower values let it wrap when a line is tight.
+\relpenalty=200
+\binoppenalty=400
+
 %%%% VERTICAL SPACE IN ALIGNED EQUATIONS
 
 %% Set a global spacing between vertically aligned equaions environments.
 %% (To add local space after the break do //[some space ie 12pt])
 % \setlength{\jot}{14pt}
+
+
+%%%% SECTION HEADINGS
+
+%% The class formats \section..\subsubsection via titlesec but leaves
+%% \paragraph to the underlying class (rapport3, used by the 'nopardent'
+%% option), which renders it as an *italic* run-in heading. The embedded
+%% publications use a *bold* run-in \paragraph, so override it here to match
+%% (this is a global change and also applies to the framing chapters).
+\titleformat{\paragraph}[runin]
+  {\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titlespacing*{\paragraph}{0pt}{1.5ex plus 1ex minus .2ex}{1em}
 
 
 %%%% TABLE OF CONTENTS AND LISTS

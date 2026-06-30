@@ -75,9 +75,18 @@
 
 \input{defintns}
 
+%%%% LOAD SUPPORT FOR THE EMBEDDED PUBLICATIONS.
+%% Packages, theorem environments, math macros and conference-macro stubs
+%% shared by the three integrated research chapters. Must come after the class
+%% has loaded (hyperref) so cleveref loads last. See papers_support.tex.
+\input{papers_support}
+
 %%%% SET THE PATH FOR DIAGRAMS.
 
-\graphicspath{{introduction/}{chapter2_deac/}{chapter3_dred/}{chapter4_persist/}{conclusions/}{appendix/}}
+%% The paper figure dirs are listed here too (not just in each chapter body's
+%% local \graphicspath) so that figure captions containing inline icons resolve
+%% when re-typeset in the List of Figures (front matter, before the chapters).
+\graphicspath{{introduction/}{chapter2_deac/}{chapter2_deac/paper/}{chapter2_deac/paper/figs/}{chapter3_dred/}{chapter3_dred/paper/}{chapter3_dred/paper/content/}{chapter4_persist/}{chapter4_persist/paper/}{chapter4_persist/paper/figs/}{conclusions/}{appendix/}}
 
 %%%% PATH TO CREST
 
@@ -158,11 +167,16 @@
 %%%% WRITE OUT BIBLIOGRAPHY
 
 %% Path to bib file. Use \edbibliography command here or the
-\edbibliography{bib/edengref}
+%% bib/edengref_combined.bib is the Phase-1 merge of the thesis bib + the three
+%% papers' .bib files (exact-duplicate keys removed; see tools/merge_bib.py).
+%% Phase 2 will fold this back into a single curated bib/edengref.bib.
+\edbibliography{bib/edengref_combined}
 
 %% Path to style file. It's recommended that you use the provided style
 %% file (a variation on plainnat) as it does italic et als and reduces
 %% all first names to initials. It also puts the surname first in apa style.
-\bibliographystyle{apacite}
+%% apaciteall = local modified apacite.bst that lists ALL authors in the
+%% reference list (no "6 authors ... last" truncation). See apaciteall.bst.
+\bibliographystyle{apaciteall}
 
 \end{document}

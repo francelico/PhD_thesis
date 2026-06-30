@@ -8,6 +8,9 @@ This decomposition makes the 3D state, rather than the recent pixel history, the
 
 Within the broader thesis narrative, this chapter addresses the first condition of the simulation bottleneck: the requirement that an accurate and interactable simulator already exist before RL agents can be trained. PERSIST intervenes on the simulation bottleneck at the level of the simulator itself, investigating how persistent interactive environments can be learned from recorded trajectories. It therefore represents the final step in the thesis's progression from improving learning within a fixed simulator, to augmenting its scenario distribution, and ultimately towards replacing manually engineered simulation with a learned world model. The publication presenting this work is reproduced without modification in the remainder of the chapter.
 
-%% The published paper, compiled standalone to paper/_thesis_main.pdf (see build_papers.sh).
+%% The published paper, integrated as native thesis source (see the plan).
+%% paper/main_text.tex has been transformed to a thesis-includable body:
+%% conference scaffolding stripped, abstract -> "Original Abstract" section,
+%% appendix as lettered subappendices, references in the global thesis bib.
 \clearpage
-\includepaper{chapter4_persist/paper/_thesis_main.pdf}{Beyond Pixel Histories: World Models with Persistent 3D State}
+\input{chapter4_persist/paper/main_text}

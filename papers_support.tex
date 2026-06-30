@@ -1,0 +1,88 @@
+%%
+%% papers_support.tex - shared support for the three embedded publications
+%%
+%% \input from edengths.tex AFTER \input{defintns} (i.e. after the class has
+%% finished loading, so hyperref is already in -- cleveref must come after it).
+%%
+%% Provides everything the publications need that the thesis class/packages.tex
+%% do not already supply, declares ONE global theorem set used by all three
+%% chapters, neutralises the conference-only title macros, and loads the shared
+%% paper math commands. The conference .sty files themselves are NOT loaded
+%% (they pull in natbib/times/fancyhdr which fight apacite and the thesis
+%% layout); only the pieces the paper bodies actually use are reproduced here.
+%%
+%% NOTE: the amsthm "first aid" hook removal that the theorem set depends on
+%% lives at the TOP of packages.tex (it must run before amsthm is loaded, which
+%% happens during class load -- too early for this file).
+
+%%%% Packages the bodies use that the thesis lacks --------------------------
+%% (Thesis already provides: graphicx, geometry, setspace, appendix, titlesec,
+%%  caption+subcaption, tocloft, hyperref, xcolor, amsmath, amssymb, amsthm,
+%%  nicefrac, booktabs, apacite, babel, url.)
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+\usepackage{bm}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{adjustbox}            % max width=\linewidth wrapper for wide tables
+\usepackage[most]{tcolorbox}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[disable]{todonotes}   % \todo / \todoin render nothing in the thesis
+\usepackage{thmtools}
+\usepackage{thm-restate}          % DEAC's restatable theorems (\THGenBound*)
+
+%% A few commath-style helpers the bodies use (\norm in ch4, \dif in ch3),
+%% provided via mathtools rather than loading commath (which is aggressive).
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\providecommand{\dif}{\mathop{}\!\mathrm{d}}
+
+%% hyperref bookmark counter for algorithms (paper preambles defined this).
+\providecommand{\theHalgorithm}{\arabic{algorithm}}
+\providecommand{\todoin}[2][]{}   % DEAC's custom inline-todo macro: no-op
+
+%% cleveref must be the LAST of the cross-reference packages.
+\usepackage[capitalize,noabbrev]{cleveref}
+%% Undo the TL2026 kernel "first aid" patch for cleveref's counter aliasing
+%% (the amsthm one is removed in packages.tex, before amsthm loads).
+\RemoveFromHook{package/cleveref/after}[firstaid/aliascounter]
+
+%%%% One global theorem set for all three papers ----------------------------
+%% Declared once (re-issuing \newtheorem{theorem} per chapter would error).
+%% theorem is numbered within section (=> "2.3.1", unique across chapters);
+%% the rest are siblings sharing its counter, matching the papers' scheme.
+\declaretheorem[numberwithin=section]{theorem}
+\declaretheorem[sibling=theorem]{proposition}
+\declaretheorem[sibling=theorem]{lemma}
+\declaretheorem[sibling=theorem]{corollary}
+\declaretheorem[sibling=theorem]{assumption}
+\declaretheorem[style=definition,sibling=theorem]{definition}
+\declaretheorem[style=remark,sibling=theorem]{remark}
+
+%%%% Neutralise conference-only macros --------------------------------------
+%% The transformation that turns each paper into thesis source strips the
+%% title/author block, so these should never be called; defined as no-ops as
+%% insurance against a stray survivor (avoids "undefined control sequence").
+\newcommand{\icmltitle}[1]{}
+\newcommand{\icmltitlerunning}[1]{}
+\newcommand{\icmlauthor}[2]{}
+\newcommand{\icmlsetsymbol}[2]{}
+\newcommand{\icmlaffiliation}[2]{}
+\newcommand{\icmlcorrespondingauthor}[2]{}
+\newcommand{\icmlkeywords}[1]{}
+\newcommand{\icmlEqualContribution}{}
+\newcommand{\printAffiliationsAndNotice}[1]{}
+\newenvironment{icmlauthorlist}{}{}
+\providecommand{\And}{}
+\renewcommand{\twocolumn}[1][]{#1}   % single-column thesis: passthrough only
+\renewcommand{\onecolumn}{}
+\providecommand{\iclrfinalcopy}{}
+%% NB: \crefalias (used in ch4) is a real cleveref command -- do NOT stub it.
+
+%%%% Shared paper math commands ----------------------------------------------
+\input{papers_mathcommands}
