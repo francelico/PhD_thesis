@@ -63,6 +63,14 @@
 %% Note: 'breakurl' must be the last package (which is normally 'hyperref').
 \usepackage[hyphens]{url} 
 
+%% TL2026 toolchain fix for the embedded publications' theorem setup.
+%% The kernel's "first aid" hook patches amsthm's \newtheorem machinery and,
+%% under TeX Live 2026 + thmtools, collides with sibling theorem declarations
+%% (`\c@lemma already defined`). Remove it BEFORE amsthm loads (here); the
+%% cleveref counterpart is removed in papers_support.tex. Harmless if the hook
+%% is absent. See papers_support.tex for the theorem declarations themselves.
+\RemoveFromHook{package/amsthm/after}[firstaid/aliascounter]
+
 %% AMS Math Packages
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -77,6 +85,11 @@
 %% Nicer tables
 \usepackage{booktabs}
 
+%% Microtypographic protrusion + font expansion. The single most effective
+%% reducer of overfull lines / text spilling into the margin (also used by the
+%% embedded publications). Loaded after the document fonts.
+\usepackage{microtype}
+
 %% Citations
 \usepackage[natbibapa]{apacite}
 
@@ -89,9 +102,8 @@
 %% Paragraph control
 \usepackage[defaultlines=4,all]{nowidow}
 
-%% Embed each published paper's standalone-compiled PDF (thesis-by-publication).
-%% See the \includepaper macro in defintns.tex.
-\usepackage{pdfpages}
+%% (pdfpages removed: the publications are now integrated as native thesis
+%% source rather than embedded as standalone-compiled PDFs.)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

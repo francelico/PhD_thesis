@@ -1,269 +1,64 @@
-%%%%%%%% ICML 2026 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%% ======================================================================
+%% Chapter 4 (PERSIST) -- ICML 2026 paper, integrated as native thesis source.
+%% Transformed from the published paper: conference preamble, title/author
+%% block, and bibliography removed; abstract -> "Original Abstract" section;
+%% inline appendix wrapped in subappendices; cross-ref labels prefixed c4:;
+%% full-width floats un-starred. See the plan and tools/integrate_paper.py.
+%% ======================================================================
+\graphicspath{{chapter4_persist/paper/}{chapter4_persist/paper/figs/}}
 
-\documentclass{article}
-
-% Optional math commands from https://github.com/goodfeli/dlbook_notation.
-\input{math_commands.tex}
-
-% Recommended, but optional, packages for figures and better typesetting:
-\usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{subcaption}
-\usepackage{booktabs} % for professional tables
-\usepackage{tabularx}
-\usepackage{multirow}
-\usepackage[table]{xcolor}
-\usepackage{array}
-\usepackage{wrapfig}
-
-\usepackage{printlen}
-\usepackage{enumitem}
-
-
-% hyperref makes hyperlinks in the resulting PDF.
-% If your build breaks (sometimes temporarily if a hyperlink spans a page)
-% please comment out the following usepackage line and replace
-% \usepackage{icml2026} with \usepackage[nohyperref]{icml2026} above.
-\usepackage[hyphens]{url}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true,breaklinks=true}
-
-
-% Attempt to make hyperref and algorithmic work together better:
-\newcommand{\theHalgorithm}{\arabic{algorithm}}
-
-% Use the following line for the initial blind version submitted for review:
-% \usepackage{icml2026}
-
-% For preprint, use
-% \usepackage[preprint]{icml2026}
-
-% If accepted, instead use the following line for the camera-ready submission:
-\usepackage[accepted]{icml2026}
-
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{amsthm}
-\usepackage{caption}
-\setlength{\textfloatsep}{5pt}
-\setlength{\floatsep}{6pt}
-\setlength{\intextsep}{6pt}
-\captionsetup[table]{skip=4pt}
-\captionsetup[figure]{skip=4pt}
-
-% if you use cleveref..
-\usepackage[capitalize,noabbrev]{cleveref}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THEOREMS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{assumption}[theorem]{Assumption}
-\theoremstyle{remark}
-\newtheorem{remark}[theorem]{Remark}
-
-% Todonotes is useful during development; simply uncomment the next line
-%    and comment out the line below the next line to turn off comments
-%usepackage[disable,textsize=tiny]{todonotes}
-\usepackage[textsize=tiny]{todonotes}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CUSTOM PACKAGES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% figures
-% \usepackage{wrapfig}
-% \usepackage{floatflt}
-\usepackage[most]{tcolorbox}
+%% Paper-preamble leftovers used by the body: the tcolorbox image style and the
+%% line-number-aware algorithmic layout. \Input/\Output are \def'd because
+%% chapter 3 defines them with a different arity (reading order makes the last
+%% definition the right one for each chapter). \algsetblock is omitted: \Init is
+%% unused here and chapter 3 already defines that block globally.
 \tcbset{
   myimg/.style={
-    colback=white,
-    colframe=black,
-    boxrule=0.5pt,   % ≈ 2px (1pt ≈ 1.33px)
-    arc=2pt,          % corner radius (adjust to taste)
-    boxsep=0pt,
-    left=0pt,
-    right=0pt,
-    top=0pt,
-    bottom=0pt,
-    enhanced,
-    clip upper
+    colback=white, colframe=black, boxrule=0.5pt, arc=2pt, boxsep=0pt,
+    left=0pt, right=0pt, top=0pt, bottom=0pt, enhanced, clip upper
   }
 }
-% \usepackage{float} 
-% \usepackage{subcaption}
-
-% algos 
-% --- Algorithms ---
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage{etoolbox}
-
 \algrenewcommand\algorithmicindent{1.0em}
 \algrenewcommand\algorithmicrequire{\textbf{Input:}}
 \algrenewcommand\algorithmicensure{\textbf{Output:}}
-
-% (Optional / your custom block defs — kept as-is)
-\algsetblock[Name]{Init}{6553}{0}{0cm}
-\algdefaulttext[Name]{Into}
-
-% --- Coloring helper ---
 \newcommand{\ColorState}[2]{\State {\color{#1}#2}}
-
-% ===== Two-column layout that accounts for line numbers =====
-\newlength{\algavail}     % width available for text+comment (excluding line-number label)
+\newlength{\algavail}
 \newlength{\algleftcol}
 \newlength{\algrightcol}
 \newlength{\algcolsep}
-
 \AtBeginEnvironment{algorithmic}{%
-  % Space actually available on a numbered line = \linewidth - (label box + gap)
   \setlength{\algavail}{\dimexpr\linewidth-\labelwidth-\labelsep\relax}%
   \setlength{\algcolsep}{0.02\algavail}%
   \setlength{\algleftcol}{0.6\algavail}%
   \setlength{\algrightcol}{\dimexpr\algavail-\algleftcol-\algcolsep\relax}%
 }
-
-% Consistent vertical metrics (prevents jitter)
 \newcommand{\AlgLeftBox}[1]{%
   \parbox[t]{\algleftcol}{\raggedright\strut\ignorespaces#1\unskip\strut}%
 }
-% Right column box (top-aligned, but we will smash/overlay it)
 \newcommand{\AlgRightBox}[1]{%
   \parbox[t]{\algrightcol}{%
-    \vspace{0pt}% ensures proper top alignment in a \parbox[t]
-    \raggedright\footnotesize\color{gray}%
-    \ignorespaces#1\unskip
+    \vspace{0pt}\raggedright\footnotesize\color{gray}\ignorespaces#1\unskip
   }%
 }
-
-% Left column for ALL \State text
 \let\OldState\State
-\renewcommand{\State}[1]{%
-  \OldState \AlgLeftBox{#1}%
-}
-
-% Inline comments: put them in the right column WITHOUT affecting line height/depth
-% A stable lift to align comment with top of the line.
-% \ht\strutbox is the height of \strut above the baseline.
+\renewcommand{\State}[1]{\OldState \AlgLeftBox{#1}}
 \newlength{\algcommentlift}
 \setlength{\algcommentlift}{\ht\strutbox}
-
 \algrenewcommand{\algorithmiccomment}[1]{%
-  \hspace{\algcolsep}%
-  \rlap{%
-    \smash{%
-      \raisebox{\algcommentlift}[0pt][0pt]{\AlgRightBox{#1}}%
-    }%
-  }%
+  \hspace{\algcolsep}\rlap{\smash{\raisebox{\algcommentlift}[0pt][0pt]{\AlgRightBox{#1}}}}%
 }
-
-% Full-line comment: unnumbered, left column only
 \newcommand{\FullComment}[1]{%
-  \Statex
-  \AlgLeftBox{\footnotesize\color{gray}$\triangleright$\hspace{0.4em}#1}%
+  \Statex \AlgLeftBox{\footnotesize\color{gray}$\triangleright$\hspace{0.4em}#1}%
 }
+\def\Input#1{\Require \AlgLeftBox{#1}}
+\def\Output#1{\Ensure \AlgLeftBox{#1}}
 
-% Multi-line Input/Output (confined to left column)
-\newcommand{\Input}[1]{%
-  \Require \parbox[t]{\algleftcol}{\raggedright #1}%
-}
-\newcommand{\Output}[1]{%
-  \Ensure \parbox[t]{\algleftcol}{\raggedright #1}%
-}
-
-% Input/Output confined to left column (optional but recommended)
-\renewcommand{\Input}[1]{%
-  \Require \AlgLeftBox{#1}%
-}
-\renewcommand{\Output}[1]{%
-  \Ensure \AlgLeftBox{#1}%
-}
-
-
-
-% from ICLR template
-\usepackage{commath}
-
-% The \icmltitle you define below is probably too long as a header.
-% Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{World Models with Persistent 3D State}
-
-\begin{document}
-
-\twocolumn[
-  \icmltitle{Beyond Pixel Histories:
-    World Models with Persistent 3D State}
-
-  % It is OKAY to include author information, even for blind submissions: the
-  % style file will automatically remove it for you unless you've provided
-  % the [accepted] option to the icml2026 package.
-
-  % List of affiliations: The first argument should be a (short) identifier you
-  % will use later to specify author affiliations Academic affiliations
-  % should list Department, University, City, Region, Country Industry
-  % affiliations should list Company, City, Region, Country
-
-  % You can specify symbols, otherwise they are numbered in order. Ideally, you
-  % should not use this facility. Affiliations will be numbered in order of
-  % appearance and this is the preferred way.
-  \icmlsetsymbol{equal}{*}
-
-  \begin{icmlauthorlist}
-    \icmlauthor{Samuel Garcin}{equal,edb}
-    \icmlauthor{Thomas Walker}{equal,edb}
-    \icmlauthor{Steven McDonagh}{edb}
-    \icmlauthor{Tim Pearce}{msr}
-    \icmlauthor{Hakan Bilen}{edb}
-    \icmlauthor{Tianyu He}{msr}
-    \icmlauthor{Kaixin Wang}{msr}
-    \icmlauthor{Jiang Bian}{msr}
-    \vskip 0.05in
-{\hypersetup{urlcolor=magenta}\href{https://francelico.github.io/persist.github.io/}{\texttt{francelico.github.io/persist.github.io}}}
-  \end{icmlauthorlist}
-
-  \icmlaffiliation{edb}{University of Edinburgh}
-  \icmlaffiliation{msr}{Microsoft Research}
-
-  \icmlcorrespondingauthor{Samuel Garcin}{s.garcin@ed.ac.uk}
-  \icmlcorrespondingauthor{Kaixin Wang}{kaixin96.wang@gmail.com}
-  
-  % You may provide any keywords that you find helpful for describing your
-  % paper; these are used to populate the "keywords" metadata in the PDF but
-  % will not be shown in the document
-  \icmlkeywords{World Models, Generative Models, Machine Learning, ICML}
-
-  \vskip 0.3in
-]
-
-% this must go after the closing bracket ] following \twocolumn[ ...
-
-% This command actually creates the footnote in the first column listing the
-% affiliations and the copyright notice. The command takes one argument, which
-% is text to display at the start of the footnote. The \icmlEqualContribution
-% command is standard text for equal contribution. Remove it (just {}) if you
-% do not need this facility.
-
-% Use ONE of the following lines. DO NOT remove the command.
-% If you have no special notice, KEEP empty braces:
-\printAffiliationsAndNotice{\icmlEqualContribution}  % no special notice (required even if empty)
-% Or, if applicable, use the standard equal contribution text:
-% \printAffiliationsAndNotice{\icmlEqualContribution}
-
-\begin{abstract}
+\section{Original Abstract}
 Interactive world models continually generate video by responding to a user's actions, enabling open-ended generation capabilities.
 However, existing models typically lack a 3D representation of the environment, meaning 3D consistency must be implicitly learned from data, and spatial memory is restricted to limited temporal context windows.
 This results in an unrealistic user experience and presents significant obstacles to downstream tasks such as training agents.
 To address this, we present PERSIST, a new paradigm of world model which simulates the evolution of a latent 3D scene: \textbf{environment}, \textbf{camera}, and \textbf{renderer}.
-This allows us to synthesise new frames with persistent spatial memory and consistent geometry. Both quantitative metrics and a qualitative user study show substantial improvements in spatial memory, 3D consistency, and long-horizon stability over existing methods, enabling coherent, evolving 3D worlds. We further demonstrate novel capabilities, including synthesising diverse 3D environments from a single image, as well as enabling fine-grained, geometry-aware control over generated experiences by supporting environment editing and specification directly in 3D space.
-\end{abstract}
+This allows us to synthesise new frames with persistent spatial memory and consistent geometry. Both quantitative metrics and a qualitative user study show substantial improvements in spatial memory, 3D consistency, and long-horizon stability over existing methods, enabling coherent, evolving 3D worlds. We further demonstrate novel capabilities, including synthesising diverse 3D environments from a single image, as well as enabling fine-grained, geometry-aware control over generated experiences by supporting environment editing and specification directly in 3D space. Project page: \href{https://francelico.github.io/persist.github.io}{francelico.github.io/persist.github.io}
 
 % TODOS / missing things
 
@@ -283,14 +78,14 @@ This allows us to synthesise new frames with persistent spatial memory and consi
 \section{Introduction}
 
 
-\begin{figure*}[ht]
+\begin{figure}[ht]
   \begin{center}
     \centerline{\includegraphics[width=\linewidth]{figs/Pipeline.png}}
     \caption{Initialized with a single pixel frame, PERSIST evolves in an autoregressive loop in response to user actions \includegraphics[height=1.5ex]{figs/action.png}. We first denoise the 3D environment centred on the agent in the form of a latent \textit{world-frame} \includegraphics[height=1.85ex]{figs/voxels.png}. Next, camera parameters \includegraphics[height=1.5ex]{figs/camera.png} are predicted with a feed-forward transformer. We then project the world to the camera plane to form a depth-ordered stack of world latents \includegraphics[height=1.5ex]{figs/voxel_frame.png}. Finally, pixel latents \includegraphics[height=1.5ex]{figs/pixel.png} are denoised, using pixel-aligned 3D information from the world latents stack \includegraphics[height=1.5ex]{figs/voxel_frame.png} as guidance.}
-    \label{fig:pipeline}
+    \label{c4:fig:pipeline}
     \vspace{-0.7cm}
   \end{center}
-\end{figure*}
+\end{figure}
 
 
 
@@ -298,7 +93,7 @@ Interactive world models aim to generate experiences that unfold over time in re
 
 Most existing approaches to interactive video generation rely on autoregressive (AR) models that condition on the history of past observations and actions to generate the most recent frame, often using diffusion-based transformers with causal attention~\cite{peebles2023scalable}.
 This formulation is attractive: it naturally supports real-time action conditioning, allows generation to proceed indefinitely, and integrates cleanly with recent advances in large-scale video modelling.
-As a result, AR video diffusion models form the backbone of many recent neural game engines and interactive world models~\citep{chegamegen,he2025matrix,valevskidiffusion,zhang2025matrix,yu2025gamefactory}.
+As a result, AR video diffusion models form the backbone of many recent neural game engines and interactive world models~\citep{chegamegen,he2025matrix,valevski2024diffusionmodelsrealtimegame,zhang2025matrix,yu2025gamefactory}.
 
 However, conditioning on high-dimensional visual observations is computationally expensive, and the number of prior frames that AR models can ingest is tightly constrained by hardware.
 In practice, this limits AR generation to condition on what amounts to only a few seconds of past footage, even when observations are compressed to lower spatial and/or temporal resolutions using learned autoencoders.
@@ -309,7 +104,7 @@ As the memory bank grows, identifying the relevant past evidence becomes increas
 As a result, generating extended and coherent experiences within complex 3D environments remains an open challenge.% even for frontier models.\footnote{Closed-source frontier models report achieving up to one minute of visual memory, representing the current frontier of AR generation~\citep{genie3}.}
 
 In this work, we propose to depart from pixel-based histories and substitute key frame retrieval with \textit{active key frame generation}.
-We are inspired by traditional 3D simulators and game engines, which maintain coherence by directly rendering pixel frames from a persistent and dynamically evolving 3D state of the world. We introduce PERSIST, a framework that brings persistence to learned AR world models by tracking a dynamic 3D representation of the environment. We describe our framework in \Cref{fig:pipeline}.
+We are inspired by traditional 3D simulators and game engines, which maintain coherence by directly rendering pixel frames from a persistent and dynamically evolving 3D state of the world. We introduce PERSIST, a framework that brings persistence to learned AR world models by tracking a dynamic 3D representation of the environment. We describe our framework in \Cref{c4:fig:pipeline}.
 PERSIST decomposes world simulation into three coupled components: a \textit{world-frame model} that predicts how a learned representation of a 3D scene evolves over time, a \textit{camera model} that tracks the agent’s viewpoint within this scene, and a \textit{world-to-pixel generation module} that produces observations via differentiable projection and a learned rendering function.
 
 Rather than treating pixels as the primary carrier of memory, PERSIST models the structure and dynamics of the environment in a latent 3D space.
@@ -324,14 +119,14 @@ and the emergence of off-screen dynamic processes that continue to evolve even w
 \section{Related Work}
 
 
-\begin{figure*}[ht]
+\begin{figure}[ht]
   \begin{center}
     \centerline{\includegraphics[width=0.95\linewidth]{figs/rotate_rgb.png}}
     \caption{PERSIST enables long-horizon spatial memory by modelling the dynamics of a 3D world-frame \includegraphics[height=2ex]{figs/voxels.png} around the agent. Camera parameters \includegraphics[height=1.5ex]{figs/camera.png} then act as memory look-up key, fetching relevant features from the world frame via a geometric projection (here visualized as the coloured voxels).} 
-    \label{fig:rollout-rotate}
+    \label{c4:fig:rollout-rotate}
     \vspace{-0.8cm}
   \end{center}
-\end{figure*}
+\end{figure}
 
 %\textbf{Rectified flow models.}
 %Rectified flow treats generation as learning a velocity field that transports noise to data with low-variance supervision and efficient sampling~\citep{lipman2022flow}. This objective has been shown to be compatible with transformer backbones and latent-space training, and integrates with DiT-style architectures~\citep{peebles2023scalable}. Leveraging this compatibility, we parameterise both world-frame and pixel-space denoisers as conditional rectified flow models, thereby enabling action-conditioned denoising given a fixed context. This formulation supports efficient per-step updates that preserve training stability while reducing inference cost, while also keeping a single objective across modules and horizons.
@@ -341,7 +136,7 @@ and the emergence of off-screen dynamic processes that continue to evolve even w
 % Recent methods adopt transformer-based designs~\citep{peebles2023scalable}, but are limited to generating short video clips, due to the poor scaling of attention with video length. Auto-regressive video generation denoises frames sequentially, and has emerged as a promising direction for extending video sequences indefinitely~\citep{huang2025self}.
 
 %mention key-frame retrieval in this sentence?
-\textbf{World models.} World models~\citep{https://doi.org/10.5281/zenodo.1207631} aim to simulate environments by predicting future states conditioned on user actions. Recent progress in video generation models enables high-fidelity interactive simulation~\citep{genie3,alonso2024diffusion,decart2024oasis}. However, maintaining spatial and temporal consistency over extended rollouts remains challenging due to the finite number of past frames existing models can incorporate as context. Prior works propose to alleviate this limitation via spatio-temporal compression of input tokens ~\citep{hafner2025training}, memory-efficient attention mechanisms~\citep{po2025long} or by populating the model context window with frames sampled from the full generation history~\citep{song2025history}. Among this latter class of approaches, \cite{xiao2025worldmem,huang2025memory} propose sampling strategies that retrieve key-frames according to their spatial relevance. Nevertheless, such methods rely on retrieving relevant information from an ever-growing history of pixel observations, a task that becomes increasingly difficult and costly over extended rollouts. In contrast, PERSIST retrieves contextual information directly from a dynamically evolving 3D latent state, making its information retrieval mechanism independent of episode length.
+\textbf{World models.} World models~\citep{haworldmodels2018} aim to simulate environments by predicting future states conditioned on user actions. Recent progress in video generation models enables high-fidelity interactive simulation~\citep{genie3,alonso2024diffusion,decart2024oasis}. However, maintaining spatial and temporal consistency over extended rollouts remains challenging due to the finite number of past frames existing models can incorporate as context. Prior works propose to alleviate this limitation via spatio-temporal compression of input tokens ~\citep{hafner2025training}, memory-efficient attention mechanisms~\citep{po2025long} or by populating the model context window with frames sampled from the full generation history~\citep{song2025history}. Among this latter class of approaches, \cite{xiao2025worldmem,huang2025memory} propose sampling strategies that retrieve key-frames according to their spatial relevance. Nevertheless, such methods rely on retrieving relevant information from an ever-growing history of pixel observations, a task that becomes increasingly difficult and costly over extended rollouts. In contrast, PERSIST retrieves contextual information directly from a dynamically evolving 3D latent state, making its information retrieval mechanism independent of episode length.
 
 \textbf{3D environment representations.} In parallel, a growing number of approaches incorporate explicit 3D representations into their generative architectures to produce explorable and spatially consistent environments~\citep{huang2025voyager,marble,zhou2025learning}. However, these environments remain static, restricting interaction to basic navigation within a frozen world. In contrast, PERSIST learns a 3D representation that evolves over time, enabling it to capture dynamic processes occurring within the environment, and richer agent–environment interactions.
 
@@ -355,14 +150,14 @@ and the emergence of off-screen dynamic processes that continue to evolve even w
 \vspace{-0.25cm}
 \section{Preliminaries}
 
-\begin{figure*}[ht]
+\begin{figure}[ht]
   \begin{center}
     \centerline{\includegraphics[width=\linewidth]{figs/qual.jpg}}
     \caption{PERSIST can be initialized with a single RGB frame (\includegraphics[height=1.5ex]{figs/pixel.png}, row 1), or with a single RGB and world frame (\includegraphics[height=1.5ex]{figs/pixel.png} + \includegraphics[height=2ex]{figs/voxels.png}, row 2). We visualize the world-frames and videos produced by an autoregressive rollout of 600 timesteps. Even with a single RGB frame for initialization, PERSIST can generate cohesive and evolving worlds.}
-    \label{fig:rollout-voxel}
+    \label{c4:fig:rollout-voxel}
      \vspace{-0.5cm}
   \end{center}
-\end{figure*}
+\end{figure}
 
 \textbf{Rectified flow matching.} Our approach is based on the paradigm of flow matching and diffusion models~\citep{lipman2022flow}, where the task is to restore a clean data sample $x^0$ given a noised version $x^\tau$.
 The noise level $\tau \in [0, 1]$ determines the degree of corruption of the data, where $\tau=0$ denotes clean data and $\tau=1$ indicates pure noise.
@@ -401,7 +196,7 @@ Instead, we define a proxy $\tilde{s} = \langle \vw, \vc \rangle$, where $\vw$ i
 Although not a perfect replacement for the true hidden state, $\tilde{s}$ is an effective modelling choice when $\mathcal{E}$ is a 3D environment, as it lets us:
 %todo reduce spacing [noitemsep]
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Simplify information retrieval.} \Cref{fig:rollout-rotate} demonstrates how the world-frame $\vw_t$ can function as a dynamic \textit{spatial memory} module throughout the episode, while the camera state $\vc_t$ acts as a \textit{spatial lookup key} to retrieve the spatial information in $\vw_t$ that is necessary to reconstruct $\vo_t$. $\vc_t$ encodes the information to project this information to screen-space, without requiring explicit knowledge of the true observation function.
+    \item \textbf{Simplify information retrieval.} \Cref{c4:fig:rollout-rotate} demonstrates how the world-frame $\vw_t$ can function as a dynamic \textit{spatial memory} module throughout the episode, while the camera state $\vc_t$ acts as a \textit{spatial lookup key} to retrieve the spatial information in $\vw_t$ that is necessary to reconstruct $\vo_t$. $\vc_t$ encodes the information to project this information to screen-space, without requiring explicit knowledge of the true observation function.
     \item \textbf{Improve dynamics predictions.} Tracking $\vw$ and $\vc$ over time facilitates modelling dynamics that are difficult to infer from pixel observations alone, such as interactions or collisions with out-of-view objects, or tracking how occluded regions of the environment change over time.
 \end{enumerate}
 
@@ -433,7 +228,7 @@ The resulting embeddings are added to the denoising timestep embedding and injec
 Finally, we employ the 3D-VAE to decode $\bar{\vw}_t$ to its native resolution.
 
 Crucially, $\gW_\theta$ supports conditioning on $\bar{W}=\varnothing$, making it capable of generating the initial world frame $\vw_0$ from initial condition $\langle \vo_0, \vc_0 \rangle$ at inference time.
-Thus, while we rely on $W$ to train $\gW_\theta$, we do not have to rely on ground truth 3D conditioning during inference. We provide examples for each inference configuration in \Cref{fig:rollout-voxel}.
+Thus, while we rely on $W$ to train $\gW_\theta$, we do not have to rely on ground truth 3D conditioning during inference. We provide examples for each inference configuration in \Cref{c4:fig:rollout-voxel}.
 
 
 % \textbf{Dynamic loss.}
@@ -447,7 +242,7 @@ In order to condition the pixel-space generation on 3D information we need to fo
 \textbf{World projection.} We project $\vw$ to screen-space via the projection operator \begin{equation}
     \mathcal{R}(\vc, \vw) = (\tilde{\vw}_{2D}, \vd), 
 \end{equation}
-where $\tilde{\vw}_{2D}  \in \mathbb{R}^{h \times w \times l \times m}$ is a per-pixel depth-ordered list of $l$ voxel features with $m$ channels, indexed according to their position in screen space $\langle h_i, w_j\rangle$. $\vd \in \mathbb{R}^{h \times w \times l}$ is the linear depth of each voxel feature measured in camera space. We provide a visualisation of how $\mathcal{R}$ constructs $\tilde{\vw}_{2D}$ and $\vd$ in \Cref{fig:render}. $\mathcal{R}$ employs the same $h,w$ screen dimensions as the pixel latents, ensuring pixel-level alignment with $\bar{\vo}$. Finally, we combine $\tilde{\vw}_{2D}$ and $\vd$ into $\vw_{2D}\in \mathbb{R}^{h \times w \times z}$ via channel-wise concatenation, where $z = l \times (m+1)$. %We use the CUDA-accelerated differentiable rasterization provided by~\citep{Laine2020diffrast} to generate $(\vw_{2D}, \vd)$ via a fixed-cost, single feedforward operation.
+where $\tilde{\vw}_{2D}  \in \mathbb{R}^{h \times w \times l \times m}$ is a per-pixel depth-ordered list of $l$ voxel features with $m$ channels, indexed according to their position in screen space $\langle h_i, w_j\rangle$. $\vd \in \mathbb{R}^{h \times w \times l}$ is the linear depth of each voxel feature measured in camera space. We provide a visualisation of how $\mathcal{R}$ constructs $\tilde{\vw}_{2D}$ and $\vd$ in \Cref{c4:fig:render}. $\mathcal{R}$ employs the same $h,w$ screen dimensions as the pixel latents, ensuring pixel-level alignment with $\bar{\vo}$. Finally, we combine $\tilde{\vw}_{2D}$ and $\vd$ into $\vw_{2D}\in \mathbb{R}^{h \times w \times z}$ via channel-wise concatenation, where $z = l \times (m+1)$. %We use the CUDA-accelerated differentiable rasterization provided by~\citep{Laine2020diffrast} to generate $(\vw_{2D}, \vd)$ via a fixed-cost, single feedforward operation.
 
 
 % Since we model a camera $\vc$ and 3D world-frame $\vw$, we can provide $\mathcal{P}_\theta$ with pixel-level conditioning on the relevant 3D features $\vw$ via a differentiable projection $\mathcal{R}(\vc, \vw)$ to screen-space. We then leave the final rendering step as a learned process for the screen-spa3ce denoiser $\mathcal{P}_\theta$. This choice allows the pixel denoiser to learn arbitrary compositing functions, whilst still enforcing geometric consistency through analytic projections of the 3D world.
@@ -464,7 +259,7 @@ where $\tilde{\vw}_{2D}  \in \mathbb{R}^{h \times w \times l \times m}$ is a per
     \vspace{-0.1cm}
     \caption{World frame $\vw$ features are projected to screen-space to obtain the depth-ordered stack of features $\tilde{\vw}_{2D}$ and linear depth information $\vd$.}
         \vspace{-0.2cm}
-    \label{fig:render}
+    \label{c4:fig:render}
 \end{figure}
 
 
@@ -497,31 +292,31 @@ We conduct our experiments within Luanti~\citep{luanti2024}, an open-source voxe
 
 
 \textbf{Dataset.} We use the Craftium platform~\citep{malagon2025craftium} to collect game data to train and evaluate our models. We collect $\sim$40M environment interactions consisting of player actions, camera states, pixel and 3D observations. Actions are represented as multi-hot vectors encoding individual key presses and discretised mouse movements. 3D observations are represented as a $48^3$ voxel grid centred on the agent. In Luanti, individual voxels contain semantic information about a specific spatial location, encoded as integer labels. In total, we collect $\sim$100K trajectories, amounting to 460 hours of gameplay recorded at 24Hz. 
-To interact with the game, we employ a similar strategy as~\citep{yu2025gamefactory} and design a simple policy that randomly samples from a set of pre-defined action sequences. %\Cref{app:data} provides further details on our data collection strategy.
+To interact with the game, we employ a similar strategy as~\citep{yu2025gamefactory} and design a simple policy that randomly samples from a set of pre-defined action sequences. %\Cref{c4:app:data} provides further details on our data collection strategy.
 
-\textbf{Training and Inference.} All models are trained using the AdamW~\citep{loshchilov2018decoupled} optimizer with a learning rate of $1e-4$. We first train the VAEs and pre-encode the 3D and pixel latents to accelerate the training of the dynamic models. The pixel and 3D VAEs take 4 and 12 days to train using 8 A100 GPUs. We train two versions of the 3D denoiser, ``3D-S'' and ``3D-XL'', which uses 8$\times$ more spatial tokens. 3D-S takes 3 days to train on 8 H100 GPUs, while 3D-XL and the pixel denoiser each take 10 days. The camera model trains on a single A100 in 16 hours with batch size 256. All other models use batch size 64. Each model is trained separately and assembled in the full pipeline with no further fine-tuning. At inference, we use 20 denoising steps per-frame and slightly noise past context frames to make the denoisers more resilient to imperfections in their own generations. We provide more implementation details in \Cref{app:implt}.
-
-\begin{figure*}[ht]
-  \begin{center}
-    \centerline{\includegraphics[width=0.87\linewidth]{figs/compare_87.jpg}}
-    \caption{Video frames generated over 600 timestep episodes by PERSIST (Ours), Oasis~\citep{decart2024oasis} and WorldMem~\citep{xiao2025worldmem}.}
-    \label{fig:rollout}
-    \vspace{-0.7cm}
-  \end{center}
-\end{figure*}
+\textbf{Training and Inference.} All models are trained using the AdamW~\citep{loshchilov2018decoupled} optimizer with a learning rate of $1e-4$. We first train the VAEs and pre-encode the 3D and pixel latents to accelerate the training of the dynamic models. The pixel and 3D VAEs take 4 and 12 days to train using 8 A100 GPUs. We train two versions of the 3D denoiser, ``3D-S'' and ``3D-XL'', which uses 8$\times$ more spatial tokens. 3D-S takes 3 days to train on 8 H100 GPUs, while 3D-XL and the pixel denoiser each take 10 days. The camera model trains on a single A100 in 16 hours with batch size 256. All other models use batch size 64. Each model is trained separately and assembled in the full pipeline with no further fine-tuning. At inference, we use 20 denoising steps per-frame and slightly noise past context frames to make the denoisers more resilient to imperfections in their own generations. We provide more implementation details in \Cref{c4:app:implt}.
 
 \begin{figure}[ht]
   \begin{center}
-    \centerline{\includegraphics[width=1.04\linewidth]{figs/fid_vs_t_wmshift.png}}
+    \centerline{\includegraphics[width=0.87\linewidth]{figs/compare_87.jpg}}
+    \caption{Video frames generated over 600 timestep episodes by PERSIST (Ours), Oasis~\citep{decart2024oasis} and WorldMem~\citep{xiao2025worldmem}.}
+    \label{c4:fig:rollout}
+    \vspace{-0.7cm}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \centerline{\includegraphics[width=0.69\linewidth]{figs/fid_vs_t_wmshift.png}}
     \caption{FID scores compared to ground truth over 600 frame episodes. PERSIST configurations remains stable, while baselines relying on pixel-histories degrade rapidly.}
-    \label{fig:fid_vs_t}
+    \label{c4:fig:fid_vs_t}
      %\vspace{-1cm}
   \end{center}
 \end{figure}
 
 \begin{table}[t]
   \centering
-  \caption{FVD ($\downarrow$) evaluated across different episode lengths (200, 400, and 600 frames). We compare our base configuration (PERSIST) against pixel-history baselines and various model ablations. PERSIST$+\vw_0$ is discussed in \Cref{sec:new_app}.}
+  \caption{FVD ($\downarrow$) evaluated across different episode lengths (200, 400, and 600 frames). We compare our base configuration (PERSIST) against pixel-history baselines and various model ablations. PERSIST$+\vw_0$ is discussed in \Cref{c4:sec:new_app}.}
   \small
   \setlength{\tabcolsep}{6pt}
   \begin{tabular}{lccc}
@@ -539,7 +334,7 @@ To interact with the game, we employ a similar strategy as~\citep{yu2025gamefact
   PERSIST$+\vw_0$ & 80 & 93 & 104 \\
   \bottomrule
   \end{tabular}
-  \label{tab:fvd}
+  \label{c4:tab:fvd}
   %\vspace{-0.095cm}
 \end{table}
 
@@ -562,14 +357,14 @@ To interact with the game, we employ a similar strategy as~\citep{yu2025gamefact
     \bottomrule
     \end{tabular}
     %\vspace{-0.45cm}
-    \label{tab:eval}
+    \label{c4:tab:eval}
 \end{table}
 
 \begin{figure}[ht]
   \begin{center}
     \centerline{\includegraphics[width=1.04\linewidth]{figs/edits_single.jpg}}
     \caption{PERSIST's explicit 3D representation allows us to edit the world-state during an episode, enabling intuitive fine grained control over generations. We demonstrate this above with both global edits to terrain and biome, as well as the placement of smaller assets such as trees.}
-    \label{fig:voxel-edits}
+    \label{c4:fig:voxel-edits}
      \vspace{-0.3cm}
   \end{center}
 \end{figure}
@@ -581,21 +376,21 @@ To interact with the game, we employ a similar strategy as~\citep{yu2025gamefact
 %[cam-ready: very important include in caption of new figure]
 %In the case of WorldMem, this includes initialising the memory bank used to sample key-frames with hundreds of ground truth cameras and pixel observations. This contrasts with PERSIST, which is initialised from a single initial frame $\langle \vo_0, \vc_0 \rangle$.
 
-\begin{figure*}[h]
+\begin{figure}[h]
   \begin{center}
     \centerline{\includegraphics[width=1\linewidth]{figs/dynamic.jpg}}
     \caption{PERSIST's 3D state enables collision modelling with out-of-view elements (top: player moves backwards into a tree at $t=50$). Since the 3D state is dynamic, it evolves even when unobserved (middle: a cave filling with water). This allows off-screen events to produce emergent on-screen effects (bottom: water flowing onto the player at $t=150$).}
-    \label{fig:dynamic}
+    \label{c4:fig:dynamic}
      \vspace{-0.7cm}
   \end{center}
-\end{figure*}
+\end{figure}
 
 
 \subsection{Interactive Generation}
 
 In this section, we evaluate our method's ability to generate spatially and temporally consistent interactive experiences within game worlds held out from the training set.
 
-\textbf{Baselines.} We compare our approach with Oasis~\citep{decart2024oasis} and WorldMem~\citep{xiao2025worldmemlongtermconsistentworld}, two interactive video generation methods employing the same DiT backbone as $\gP_\theta$. WorldMem tracks camera states during the rollout and guides generation by retrieving key-frames from $O^{t-1}_0$ that closely match the current camera state. Oasis directly conditions on a sliding window of the most recent $K$ observations.
+\textbf{Baselines.} We compare our approach with Oasis~\citep{decart2024oasis} and WorldMem~\citep{xiao2025worldmem}, two interactive video generation methods employing the same DiT backbone as $\gP_\theta$. WorldMem tracks camera states during the rollout and guides generation by retrieving key-frames from $O^{t-1}_0$ that closely match the current camera state. Oasis directly conditions on a sliding window of the most recent $K$ observations.
 
 \textbf{Ablations.} We conduct several ablations to evaluate the core components and design choices of our method. Unless otherwise specified, our base configuration and all ablations utilize the 3D-XL denoiser.
 \begin{itemize}[leftmargin=*,nosep]
@@ -605,17 +400,17 @@ In this section, we evaluate our method's ability to generate spatially and temp
 \end{itemize}
 Finally, we note that Oasis effectively serves as a baseline ablation of the entire 3D conditioning mechanism.
 
-\textbf{Evaluation Setup.} To ensure a fair comparison, all baselines and ablations utilize the same VAEs and are trained under an identical rectified flow formulation on the training set. We measure the Fréchet Video Distance (FVD)~\citep{unterthiner2018towards} across 168 evaluation trajectories collected from held-out game worlds. These trajectories are generated using an action policy designed to balance world exploration with revisiting previously rendered locations from new viewpoints. \Cref{tab:fvd} reports FVD scores computed over sets spanning the first 200, 400, and 600 trajectory timesteps. We use the first 400 ground truth frames and cameras to initialise WorldMem's memory bank. This contrasts with PERSIST, which only requires a single initial frame $\langle \vo_0, \vc_0 \rangle$.
+\textbf{Evaluation Setup.} To ensure a fair comparison, all baselines and ablations utilize the same VAEs and are trained under an identical rectified flow formulation on the training set. We measure the Fréchet Video Distance (FVD)~\citep{unterthiner2018towards} across 168 evaluation trajectories collected from held-out game worlds. These trajectories are generated using an action policy designed to balance world exploration with revisiting previously rendered locations from new viewpoints. \Cref{c4:tab:fvd} reports FVD scores computed over sets spanning the first 200, 400, and 600 trajectory timesteps. We use the first 400 ground truth frames and cameras to initialise WorldMem's memory bank. This contrasts with PERSIST, which only requires a single initial frame $\langle \vo_0, \vc_0 \rangle$.
 
-\textbf{Quantitative Results.} As shown in \Cref{tab:fvd}, baselines relying solely on pixel history (Oasis and WorldMem) yield significantly worse FVD scores, with generation quality degrading sharply over time. In contrast, PERSIST and its variants maintain stable FVD scores across extended horizons, highlighting the critical role of conditioning on the 3D state. Among the ablations, No-3D-Upscale suffers the highest FVD penalty. This confirms the benefit of rendering from a high-resolution 3D latent, which produces a $\vw_{2D}$ with superior depth resolution and 3D-to-pixel alignment. Conversely, PERSIST-S performs only marginally worse than the base configuration. While upscaling is crucial for rendering, the underlying 3D representation is highly robust to spatial compression (up to $512\times$ when combining the 3D-VAE and 3D-S denoiser). Finally, while Camera-GT achieves an FVD nearly identical to the base model, we observe that bypassing the learned camera model introduces physical inconsistencies that are not captured by the FVD (e.g. agent phasing through terrain or floating). We provide a qualitative example in \Cref{fig:camera_clip}.
+\textbf{Quantitative Results.} As shown in \Cref{c4:tab:fvd}, baselines relying solely on pixel history (Oasis and WorldMem) yield significantly worse FVD scores, with generation quality degrading sharply over time. In contrast, PERSIST and its variants maintain stable FVD scores across extended horizons, highlighting the critical role of conditioning on the 3D state. Among the ablations, No-3D-Upscale suffers the highest FVD penalty. This confirms the benefit of rendering from a high-resolution 3D latent, which produces a $\vw_{2D}$ with superior depth resolution and 3D-to-pixel alignment. Conversely, PERSIST-S performs only marginally worse than the base configuration. While upscaling is crucial for rendering, the underlying 3D representation is highly robust to spatial compression (up to $512\times$ when combining the 3D-VAE and 3D-S denoiser). Finally, while Camera-GT achieves an FVD nearly identical to the base model, we observe that bypassing the learned camera model introduces physical inconsistencies that are not captured by the FVD (e.g. agent phasing through terrain or floating). We provide a qualitative example in \Cref{c4:fig:camera_clip}.
 
-\textbf{Generation stability.} Qualitative analysis of sample rollouts (\Cref{fig:rollout}) confirms that pixel-history baselines consistently produce irrecoverable artifacts by the 200\textsuperscript{th} timestep. In contrast, PERSIST produces remarkably stable rollouts. We corroborate this observation by measuring FID~\citep{heusel2017gans} at each generation timestep (\Cref{fig:fid_vs_t}), finding that PERSIST suffers virtually no degradation over a 600-step episode. PERSIST does begin the episode with a slightly higher FID because it regenerates the initial pixel observation to ensure proper pixel/world-frame alignment. To demonstrate that this initial penalty is strictly an alignment artifact, \Cref{fig:fid_vs_t} includes PERSIST$+\vw_0$, a variant introduced in \Cref{sec:new_app} that receives perfectly aligned initial world and pixel frames. Regardless of initialization, PERSIST maintains its visual quality over time, whereas pixel-history baselines rapidly degrade.
+\textbf{Generation stability.} Qualitative analysis of sample rollouts (\Cref{c4:fig:rollout}) confirms that pixel-history baselines consistently produce irrecoverable artifacts by the 200\textsuperscript{th} timestep. In contrast, PERSIST produces remarkably stable rollouts. We corroborate this observation by measuring FID~\citep{heusel2017gans} at each generation timestep (\Cref{c4:fig:fid_vs_t}), finding that PERSIST suffers virtually no degradation over a 600-step episode. PERSIST does begin the episode with a slightly higher FID because it regenerates the initial pixel observation to ensure proper pixel/world-frame alignment. To demonstrate that this initial penalty is strictly an alignment artifact, \Cref{c4:fig:fid_vs_t} includes PERSIST$+\vw_0$, a variant introduced in \Cref{c4:sec:new_app} that receives perfectly aligned initial world and pixel frames. Regardless of initialization, PERSIST maintains its visual quality over time, whereas pixel-history baselines rapidly degrade.
 
-In practice, we observe that the world-frames produced by $\gW_\theta$ remain coherent for several thousand steps. Because $\vw_{2D}$ is obtained directly from these highly stable world-frames, it provides reliable structural guidance over long horizons and lets $\gP_\theta$ recover from visual artifacts. We showcase multiple examples of this self-correction over the course of a 2,000-step episode in \Cref{fig:limitations}.
+In practice, we observe that the world-frames produced by $\gW_\theta$ remain coherent for several thousand steps. Because $\vw_{2D}$ is obtained directly from these highly stable world-frames, it provides reliable structural guidance over long horizons and lets $\gP_\theta$ recover from visual artifacts. We showcase multiple examples of this self-correction over the course of a 2,000-step episode in \Cref{c4:fig:limitations}.
 
-\textbf{Human study.} While FVD and FID scores capture distribution-level discrepancies, they are known to favor per-frame visual quality over the spatial and temporal coherence of individual generations \citep{ge2024content}. To complement our automated metrics, we conduct a human study comprising over 800 rollout evaluations from 28 participants. Users rated each video on ``Visual Fidelity'', ``3D Consistency'' and ``Temporal Consistency'', before assigning an overall score. Results are summarized in \Cref{tab:eval}, with full methodological details in \Cref{app:data_met} and extended results in \Cref{app:ext_user_study}. Across all metrics, PERSIST configurations consistently outperform the baselines, corroborating our quantitative and qualitative findings. Interestingly, PERSIST-S performs similarly to the base configuration in both average user ratings and head-to-head comparisons. This highlights that the FVD penalty observed for PERSIST-S does not translate to a human-perceptible degradation in generation quality.
+\textbf{Human study.} While FVD and FID scores capture distribution-level discrepancies, they are known to favor per-frame visual quality over the spatial and temporal coherence of individual generations \citep{ge2024content}. To complement our automated metrics, we conduct a human study comprising over 800 rollout evaluations from 28 participants. Users rated each video on ``Visual Fidelity'', ``3D Consistency'' and ``Temporal Consistency'', before assigning an overall score. Results are summarized in \Cref{c4:tab:eval}, with full methodological details in \Cref{c4:app:data_met} and extended results in \Cref{c4:app:ext_user_study}. Across all metrics, PERSIST configurations consistently outperform the baselines, corroborating our quantitative and qualitative findings. Interestingly, PERSIST-S performs similarly to the base configuration in both average user ratings and head-to-head comparisons. This highlights that the FVD penalty observed for PERSIST-S does not translate to a human-perceptible degradation in generation quality.
 
-\textbf{Inference efficiency.} Finally, we conduct a preliminary investigation into the speed-quality tradeoff of our method. We find that generation stability is preserved even when reducing the number of denoising steps from 20 down to 2 and 4 for $\gW_\theta$ and $\gP_\theta$, respectively. This yields a $3\times$ inference speed-up with only a moderate impact on generation quality (see \Cref{app:speed} for a detailed analysis).
+\textbf{Inference efficiency.} Finally, we conduct a preliminary investigation into the speed-quality tradeoff of our method. We find that generation stability is preserved even when reducing the number of denoising steps from 20 down to 2 and 4 for $\gW_\theta$ and $\gP_\theta$, respectively. This yields a $3\times$ inference speed-up with only a moderate impact on generation quality (see \Cref{c4:app:speed} for a detailed analysis).
 
 %todo Add this again if head to head comparison is good. indicating that increasing the capacity of the 3D representation translates directly into stronger world modelling performance
 
@@ -631,42 +426,38 @@ In practice, we observe that the world-frames produced by $\gW_\theta$ remain co
 % - mention a separate eval set is collected in MineDojo to not induce domain shift for baselines.
 % - mention our training set if much smaller than VPT training set (check size but I think 10-100x smaller
 
-\subsection{New Applications and Emerging Capabilities}\label{sec:new_app}
+\subsection{New Applications and Emerging Capabilities}\label{c4:sec:new_app}
 
-% \begin{figure*}[ht]
+% \begin{figure}[ht]
 %   \begin{center}
 %     \centerline{\includegraphics[width=\linewidth]{figs/collision.jpg}}
 %     \caption{PERSIST captures challenging physical interactions, such as a collisions with out of view elements (tree at $t=10$)}
-%     \label{fig:collision}
+%     \label{c4:fig:collision}
 %      \vspace{-0.2cm}
 %   \end{center}
-% \end{figure*}
+% \end{figure}
 
 In addition to its improvement to the quality and coherence of generated experiences, we find that PERSIST's 3D representation confers a number of new capabilities.
 
-\textbf{3D generation.} At initialisation, it is essential for $\vw_0$ to capture the structure and semantics of the provided conditioning RGB observation. In \Cref{fig:w0_gen}, we show that $\gW_\theta$ successfully generates plausible starting world frames, while also outpainting unseen regions differently from one episode to the next. This ability lets PERSIST generate environments that are both diverse and coherent, supporting a wide variety of interactive experiences.
+\textbf{3D generation.} At initialisation, it is essential for $\vw_0$ to capture the structure and semantics of the provided conditioning RGB observation. In \Cref{c4:fig:w0_gen}, we show that $\gW_\theta$ successfully generates plausible starting world frames, while also outpainting unseen regions differently from one episode to the next. This ability lets PERSIST generate environments that are both diverse and coherent, supporting a wide variety of interactive experiences.
 
 %Todo: example
-\textbf{Explicit 3D initialisation.} By default, PERSIST initialises generation from starting condition $\langle \vo_0, \vc_0\rangle$, with the initial world-frame $\vw_0$ being inferred by the world dynamics model $\gW_\theta$. However, PERSIST also supports $\vw_0$ being provided as a starting condition\footnote{See \Cref{alg:PERSIST,alg:PERSIST-w0} for the respective inference algorithms of PERSIST and PERSIST+$\vw_0$.}. This explicit 3D conditioning allows a greater degree of control over the generated experience than providing an image, as the full surroundings of the agent can be specified.
+\textbf{Explicit 3D initialisation.} By default, PERSIST initialises generation from starting condition $\langle \vo_0, \vc_0\rangle$, with the initial world-frame $\vw_0$ being inferred by the world dynamics model $\gW_\theta$. However, PERSIST also supports $\vw_0$ being provided as a starting condition\footnote{See \Cref{c4:alg:PERSIST,c4:alg:PERSIST-w0} for the respective inference algorithms of PERSIST and PERSIST+$\vw_0$.}. This explicit 3D conditioning allows a greater degree of control over the generated experience than providing an image, as the full surroundings of the agent can be specified.
 
 
-To assess how effectively PERSIST can leverage explicit 3D conditioning, we evaluate a variant denoted PERSIST+$\vw_0$, where a ground-truth world-frame $\vw_0$ is provided at initialisation. PERSIST+$\vw_0$ achieves lower FID and FVD scores and higher human ratings (\Cref{tab:fvd,tab:eval}, \Cref{fig:fid_vs_t}), demonstrating that the model successfully incorporates the additional information contained within $\vw_0$. % COMMENTED BECAUSE NO LONGER TRUE WITH LARGER HUMAN STUDY Notably, PERSIST and PERSIST+$\vw_0$ achieve similar human ratings. Here, FVD gains primarily reflect how additional information about the environment's initial state brings closer alignment with the evaluation videos. However there is no perceptible impact to the consistency or the quality of individual experiences when this information is not available, as PERSIST successfully extrapolates from $\langle \vo_0, \vc_0\rangle$ to generate a coherent 3D environment.
+To assess how effectively PERSIST can leverage explicit 3D conditioning, we evaluate a variant denoted PERSIST+$\vw_0$, where a ground-truth world-frame $\vw_0$ is provided at initialisation. PERSIST+$\vw_0$ achieves lower FID and FVD scores and higher human ratings (\Cref{c4:tab:fvd,c4:tab:eval}, \Cref{c4:fig:fid_vs_t}), demonstrating that the model successfully incorporates the additional information contained within $\vw_0$. % COMMENTED BECAUSE NO LONGER TRUE WITH LARGER HUMAN STUDY Notably, PERSIST and PERSIST+$\vw_0$ achieve similar human ratings. Here, FVD gains primarily reflect how additional information about the environment's initial state brings closer alignment with the evaluation videos. However there is no perceptible impact to the consistency or the quality of individual experiences when this information is not available, as PERSIST successfully extrapolates from $\langle \vo_0, \vc_0\rangle$ to generate a coherent 3D environment.
 
-\textbf{World edits mid-generation.} \citet{valevski2024diffusionmodelsrealtimegame} and \citet{kanervisto2025world} proposed to perform manual edits to generated pixel frames before re-injecting them as context, as an alternative way of controlling the generated experience. As we can extract $\vw_t$ at any point during generation, we obtain the capability of making precise 3D-edits to the world mid-episode. We pause generation at timestep $t$ and manually edit $\vw_t$ to obtain $\tilde{\vw}_t$. We then restart generation using $\{\tilde{\vw}_t, \vc_t, \vo_t, \va_t\}$ as the starting condition. We show several edit examples in \Cref{fig:voxel-edits}. 
+\textbf{World edits mid-generation.} \citet{valevski2024diffusionmodelsrealtimegame} and \citet{kanervisto2025world} proposed to perform manual edits to generated pixel frames before re-injecting them as context, as an alternative way of controlling the generated experience. As we can extract $\vw_t$ at any point during generation, we obtain the capability of making precise 3D-edits to the world mid-episode. We pause generation at timestep $t$ and manually edit $\vw_t$ to obtain $\tilde{\vw}_t$. We then restart generation using $\{\tilde{\vw}_t, \vc_t, \vo_t, \va_t\}$ as the starting condition. We show several edit examples in \Cref{c4:fig:voxel-edits}. 
 
-\textbf{Persistent world dynamics.} PERSIST learns to model environmental processes that evolve on their own. In \Cref{fig:dynamic}, we provide examples of environment dynamics and interactions occurring outside of the agent's view. We observe that dynamics occurring off-screen will sometimes act as causal drivers for emergent on-screen effects.
+\textbf{Persistent world dynamics.} PERSIST learns to model environmental processes that evolve on their own. In \Cref{c4:fig:dynamic}, we provide examples of environment dynamics and interactions occurring outside of the agent's view. We observe that dynamics occurring off-screen will sometimes act as causal drivers for emergent on-screen effects.
 
-%PERSIST continuously models dynamic processes in the environment, even while they are not being actively rendered to screen space. In \Cref{dynamic}, we observe a waterfall gradually flooding the area, causing some water to eventually appear in the player's view.
+%PERSIST continuously models dynamic processes in the environment, even while they are not being actively rendered to screen space. In \Cref{c4:dynamic}, we observe a waterfall gradually flooding the area, causing some water to eventually appear in the player's view.
 \vspace{-0.25cm}
 \section{Conclusion}
 \vspace{-0.22cm}
 In this work, we introduced PERSIST, a world modelling framework that tracks the evolution of a persistent latent 3D state. Our results demonstrate that actively generating guidance frames from this 3D state substantially improves spatial memory, temporal coherence, and overall generation quality and stability compared to conditioning on pixel-based histories. We show that tracking this 3D world state allows the model to capture environment dynamics occurring beyond the agent's view. Additionally, it lets users pre-specify, visualise, and modify the structure of generated environments, creating new ways of controlling generated experiences.
 
-Despite these advances, PERSIST currently relies on ground-truth 3D supervision during training and maintains a finite region of 3D space in memory. Furthermore, our implementation was not optimised for inference speed and does not yet achieve real-time inference. We believe these limitations outline a clear roadmap for future research involving persistent 3D world states: in-the-wild training via synthetic 3D annotations obtained from 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages}, end-to-end post-training on generated rollouts to mitigate autoregressive drift~\citep{huang2025self}, and access to unconstrained spatial memory via a 3D memory bank. We provide a detailed discussion of these directions in Appendix~\ref{app:limitations}.
-
-\clearpage
-\section*{Acknowledgments}
-We thank Dave Abel, Chris Lucas, Jianfeng Xiang, Aidan Scannell, Adam Jelley and Octave Mariotti for their insightful comments and suggestions. We also thank the anonymous participants in the human study for their time.
+Despite these advances, PERSIST currently relies on ground-truth 3D supervision during training and maintains a finite region of 3D space in memory. Furthermore, our implementation was not optimised for inference speed and does not yet achieve real-time inference. We believe these limitations outline a clear roadmap for future research involving persistent 3D world states: in-the-wild training via synthetic 3D annotations obtained from 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages}, end-to-end post-training on generated rollouts to mitigate autoregressive drift~\citep{huang2025self}, and access to unconstrained spatial memory via a 3D memory bank. We provide a detailed discussion of these directions in Appendix~\ref{c4:app:limitations}.
 
 \section*{Impact Statement}
 
@@ -678,20 +469,20 @@ We do not foresee any immediate negative societal consequences that require spec
 % references without citing it in the main text, use \nocite
 % \nocite{langley00}
 
-\bibliography{biblio}  
-\bibliographystyle{icml2026}
+%% (references resolve against the global thesis bibliography)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % APPENDIX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\appendix
+%% --- Appendix: rendered as per-chapter lettered sections (A, B, ...) ---
+\clearpage
+\begin{subappendices}
 \crefalias{section}{appendix}
-\onecolumn
+\crefalias{subsection}{appendix}
 
-\section{Additional Implementation Details}\label{app:implt}
+\section{Additional Implementation Details}\label{c4:app:implt}
 
 
 \subsection{Additional Model Details}
@@ -704,14 +495,14 @@ We do not foresee any immediate negative societal consequences that require spec
 
 \subsection{PERSIST and PERSIST$+w_0$ Inference Logic}
 We detail the inference procedures for PERSIST with and without 3D state $w_0$ initialization in
-Algorithms~\ref{alg:PERSIST} and~\ref{alg:PERSIST-w0} respectively.
+Algorithms~\ref{c4:alg:PERSIST} and~\ref{c4:alg:PERSIST-w0} respectively.
 
 \subsection{Model and Inference Hyperparameters}
-We summarize the model architectures and inference hyperparameters used in our system. Table~\ref{table:w-vae} and Table~\ref{table:p-vae} describe the configurations of the 3D-VAE and 2D-VAE respectively, while Table~\ref{table:cam-model} details the camera model architecture. We further report the world and pixel denoiser configurations in Table~\ref{table:world-denoiser} and Table~\ref{table:pixel-denoiser}. Finally, Table~\ref{table:samplers} summarizes inference-time sampling hyperparameters, and Table~\ref{table:cam-model} lists token statistics across models.
+We summarize the model architectures and inference hyperparameters used in our system. Table~\ref{c4:table:w-vae} and Table~\ref{c4:table:p-vae} describe the configurations of the 3D-VAE and 2D-VAE respectively, while Table~\ref{c4:table:cam-model} details the camera model architecture. We further report the world and pixel denoiser configurations in Table~\ref{c4:table:world-denoiser} and Table~\ref{c4:table:pixel-denoiser}. Finally, Table~\ref{c4:table:samplers} summarizes inference-time sampling hyperparameters, and Table~\ref{c4:table:cam-model} lists token statistics across models.
 
 
 
-\begin{table*}[]
+\begin{table}[htbp]
 \centering
 \scriptsize
 \setlength{\tabcolsep}{4pt}
@@ -720,7 +511,7 @@ We summarize the model architectures and inference hyperparameters used in our s
 \centering
 
 \caption{3D-VAE configuration.}
-\label{table:w-vae}
+\label{c4:table:w-vae}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -735,7 +526,7 @@ $\bar{w}$ shape & [12, 12, 12, 48] \\
 \vspace{0.8em}
 
 \caption{2D-VAE configuration.}
-\label{table:p-vae}
+\label{c4:table:p-vae}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -755,7 +546,7 @@ decoder number of heads & 16 \\
 \vspace{0.8em}
 
 \caption{Camera model configuration.}
-\label{table:cam-model}
+\label{c4:table:cam-model}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -773,7 +564,7 @@ context window size & 8 \\
 \vspace{0.8em}
 
 \caption{Number of spatial and temporal tokens for different models.}
-\label{table:tokens}
+\label{c4:table:tokens}
 \begin{tabular}{lcc}
 \toprule
 Model & \# Temporal Tokens & \# Spatial Tokens \\
@@ -791,7 +582,7 @@ $\gC_\theta$ & 8 & n/a \\
 \centering
 
 \caption{World denoiser hyperparameters (3D-S configuration). The XL configuration uses patch size=1 and has the same number of learned parameters.}
-\label{table:world-denoiser}
+\label{c4:table:world-denoiser}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -811,7 +602,7 @@ context window size & 8 \\
 \vspace{0.8em}
 
 \caption{Pixel denoiser configuration.}
-\label{table:pixel-denoiser}
+\label{c4:table:pixel-denoiser}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -834,7 +625,8 @@ context window size & 16 \\
 \vspace{0.8em}
 
 \caption{Flow matching sampler configurations at inference time.}
-\label{table:samplers}
+\label{c4:table:samplers}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{cc}\toprule
 Parameter & Value \\
 \midrule
@@ -845,16 +637,17 @@ $\eta$ & 3 \\
 noise level applied to context (past) frames $\tau_\text{ctx}$ & 0.02 ($\gW_\theta$) / 0.1 ($\gP_\theta$) \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 
 \end{minipage}
 
-\end{table*}
+\end{table}
 
 
 
 %\clearpage
 
-\section{Evaluation Methodology}\label{app:data_met}
+\section{Evaluation Methodology}\label{c4:app:data_met}
 
 % \subsection{Training data}
 % \todo[inline]{
@@ -885,8 +678,8 @@ These policies are designed to produce trajectories that require a high level of
 
 For the human study, we evaluated the models released by the original authors, as we conducted it prior to training Oasis and WorldMem models on our training set. As these methods were trained using Minecraft data, we collected separate evaluation sets in Minedojo~\citep{fan2022minedojo} to not induce domain shift, and we replicated their respective inference configurations. In the case of WorldMem, this included initialising the memory bank used to sample key-frames with 600 ground truth cameras and pixel observations. To ensure this difference in domains did not bias human ratings, we compared ratings of ground-truth videos from both sets. We observed no significant preference for either domain, with a difference in average scores of less than 0.15 (3.75\%).
 
-\subsection{Human Study Protocol}\label{app:method_user_study}
-The user study was deployed via a custom web interface (see Figure~\ref{fig:ui_screenshot}). Participants were tasked with scoring videos according to the following metrics and instructions:
+\subsection{Human Study Protocol}\label{c4:app:method_user_study}
+The user study was deployed via a custom web interface (see Figure~\ref{c4:fig:ui_screenshot}). Participants were tasked with scoring videos according to the following metrics and instructions:
 \begin{itemize}
     \item \textbf{Visual Fidelity.} Per-frame visual quality of the video. Deduct points for visual artifacts such as blurriness, color shifts, flickering, noise, or texture degradation.
     \item \textbf{3D Spatial Consistency.} Spatial consistency of the scene. Deduct points if objects deform, shift, or change appearance when viewed from different camera angles, or if the relative depth and spatial relationships between objects appear inconsistent as the player moves.
@@ -901,10 +694,10 @@ Overall, a total of 28 participants evaluated over 800 videos. 93\% of study par
     \centering
     \includegraphics[width=1.0\linewidth]{figs/UI.png}
     \caption{\textbf{User Study Interface.} A screenshot of our web-based platform where participants evaluate video pairs based on temporal and spatial consistency.}
-    \label{fig:ui_screenshot}
+    \label{c4:fig:ui_screenshot}
 \end{figure}
 
-\section{Extended User Study Results}\label{app:ext_user_study}
+\section{Extended User Study Results}\label{c4:app:ext_user_study}
 
 \subsection{Score Differences During Head-to-Head Comparisons}
 Given that users rate two side-by-side videos during each trial, we can analyse how our default configuration fares in a direct head-to-head comparison against any other baseline, PERSIST configuration, or the ground truth data. We provide score comparison matrices below (one per metric) displaying the average score deltas during head-to-head comparisons.
@@ -912,21 +705,21 @@ Given that users rate two side-by-side videos during each trial, we can analyse 
 PERSIST configurations consistently outperform the baselines in every head-to-head comparison. During head-to-head comparisons between PERSIST-S and the default configuration, PERSIST-S narrowly wins on 3D Spatial Consistency ($+0.21$), while the default configuration achieves a slightly higher Overall Quality Score ($+0.14$). The differences in Visual Fidelity and Temporal Consistency are too narrow to call for either side. While the default configuration achieves a better FVD, the results of the study indicate that humans do not observe a significant performance degradation when we decrease the number of spatial tokens allotted to $\gW_\theta$. In contrast, PERSIST$+\vw_0$ wins most head-to-head comparisons against base and PERSIST-S, which indicates that providing direct 3D conditioning generally improves performance. 
 
 Finally, users consistently prefer ground-truth videos across all metrics, highlighting that even our strongest configurations remain below the quality of real trajectories. This persistent gap underscores both the difficulty of long-horizon world modelling with procedurally generated environments, and the opportunity for further advances in persistent 3D generative representations.
-\begin{figure*}[!htb]
+\begin{figure}[!htb]
     \centering
 
     \begin{subfigure}{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{figs/h2h_png/h2h_metric_a.png}
         \caption{\textbf{Visual fidelity}}
-        \label{fig:hth_a}
+        \label{c4:fig:hth_a}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{figs/h2h_png/h2h_metric_b.png}
         \caption{\textbf{3D spatial consistency}}
-        \label{fig:hth_b}
+        \label{c4:fig:hth_b}
     \end{subfigure}
 
     \vspace{0.5em}
@@ -935,24 +728,24 @@ Finally, users consistently prefer ground-truth videos across all metrics, highl
         \centering
         \includegraphics[width=\linewidth]{figs/h2h_png/h2h_metric_c.png}
         \caption{\textbf{Temporal consistency}}
-        \label{fig:hth_c}
+        \label{c4:fig:hth_c}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{figs/h2h_png/h2h_metric_d.png}
         \caption{\textbf{Overall quality score}}
-        \label{fig:hth_d}
+        \label{c4:fig:hth_d}
     \end{subfigure}
 
     \caption{Score differences during head-to-head comparisons across evaluation metrics.}
-    \label{fig:hth_all}
-\end{figure*}
+    \label{c4:fig:hth_all}
+\end{figure}
 
 
 \begin{algorithm}[htb!]
 \centering
-\caption{PERSIST inference logic.}\label{alg:PERSIST}
+\caption{PERSIST inference logic.}\label{c4:alg:PERSIST}
 \begin{algorithmic}[1]
 \Input{Models $\gW_\theta$, $\gC_\theta$, $\gP_\theta$, 2D-VAE, 3D-VAE, \\ Model context window sizes $K_{\gW}$, $K_{\gC}$, $K_{\gP}$, \\ 
 Renderer $\gR$, \\
@@ -982,7 +775,7 @@ Agent.}
 
 \begin{algorithm}[htb!]
 \centering
-\caption{PERSIST$+w_0$ inference logic. \textcolor{blue}{Changes to \Cref{alg:PERSIST} in blue.}}\label{alg:PERSIST-w0}
+\caption{PERSIST$+w_0$ inference logic. \textcolor{blue}{Changes to \Cref{c4:alg:PERSIST} in blue.}}\label{c4:alg:PERSIST-w0}
 \begin{algorithmic}[1]
 \Input{Models $\gW_\theta$, $\gC_\theta$, $\gP_\theta$, 2D-VAE, 3D-VAE, \\ Model context window sizes $K_{\gW}$, $K_{\gC}$, $K_{\gP}$, \\ 
 Renderer $\gR$, \\
@@ -1015,6 +808,7 @@ Agent.}
 \begin{table}[htb!]
 \centering
 \caption{Per set user study scores: \textbf{circle around}.}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lcccc}
 \toprule
 Method & Per Frame Visual Fidelity$\uparrow$ & 3D Consistency$\uparrow$ & Temporal Consistency$\uparrow$ & Overall Score$\uparrow$ \\
@@ -1026,13 +820,15 @@ PERSIST & 3.0 $\pm$ 0.2 & 2.5 $\pm$ 0.1 & 2.2 $\pm$ 0.1 & 2.5 $\pm$ 0.1 \\
 PERSIST$+w_0$ & \textbf{3.4 $\pm$ 0.2} & \textbf{3.0 $\pm$ 0.2} & \textbf{2.7 $\pm$ 0.3} & \textbf{3.1 $\pm$ 0.2} \\
 \bottomrule
 \end{tabular}
-\label{tab:user_study_scores_circle_around}
+\end{adjustbox}
+\label{c4:tab:user_study_scores_circle_around}
 \end{table}
 
 \begin{table}[htb!]
 \centering
 \caption{Per set user study scores: \textbf{free play}.}
-\label{tab:user_study_scores_free_play}
+\label{c4:tab:user_study_scores_free_play}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lcccc}
 \toprule
 Method & Per Frame Visual Fidelity$\uparrow$ & 3D Consistency$\uparrow$ & Temporal Consistency$\uparrow$ & Overall Score$\uparrow$ \\
@@ -1044,11 +840,13 @@ PERSIST & 2.9 $\pm$ 0.2 & 2.8 $\pm$ 0.2 & 2.8 $\pm$ 0.2 & 2.8 $\pm$ 0.2 \\
 PERSIST$+w_0$ & \textbf{3.6 $\pm$ 0.2} & \textbf{3.1 $\pm$ 0.2} & \textbf{3.3 $\pm$ 0.2} & \textbf{3.4 $\pm$ 0.2} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 \begin{table}[htb!]
 \centering
-\caption{Per set user study scores: \textbf{backwards and look around}.}\label{tab:user_study_scores_backward_and_look_around}
+\caption{Per set user study scores: \textbf{backwards and look around}.}\label{c4:tab:user_study_scores_backward_and_look_around}
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lcccc}
 \toprule
 Method & Per Frame Visual Fidelity$\uparrow$ & 3D Consistency$\uparrow$ & Temporal Consistency$\uparrow$ & Overall Score$\uparrow$ \\
@@ -1060,12 +858,14 @@ PERSIST & 2.7 $\pm$ 0.2 & 2.4 $\pm$ 0.2 & 2.4 $\pm$ 0.2 & 2.5 $\pm$ 0.1 \\
 PERSIST$+w_0$ & \textbf{3.0 $\pm$ 0.2} & 2.6 $\pm$ 0.2 & 2.6 $\pm$ 0.2 & \textbf{2.8 $\pm$ 0.2} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 \begin{table}[htb!]
 \caption{Per set user study scores: \textbf{forward and look around}.}
-\label{tab:user_study_scores_forward_and_look_around}
+\label{c4:tab:user_study_scores_forward_and_look_around}
 \centering
+\begin{adjustbox}{max width=\linewidth}
 \begin{tabular}{lcccc}
 \toprule
 Method & Per Frame Visual Fidelity$\uparrow$ & 3D Consistency$\uparrow$ & Temporal Consistency$\uparrow$ & Overall Score$\uparrow$ \\
@@ -1076,6 +876,7 @@ PERSIST-S & 2.2 $\pm$ 0.2 & 2.3 $\pm$ 0.2 & 2.1 $\pm$ 0.2 & 2.3 $\pm$ 0.2 \\
 PERSIST & 2.6 $\pm$ 0.2 & 2.3 $\pm$ 0.2 & \textbf{2.3 $\pm$ 0.2} & \textbf{2.4 $\pm$ 0.1} \\
 PERSIST$+w_0$ & \textbf{2.7 $\pm$ 0.2} & \textbf{2.4 $\pm$ 0.2} & \textbf{2.3 $\pm$ 0.2} & \textbf{2.4 $\pm$ 0.2} \\\bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 
@@ -1084,7 +885,7 @@ PERSIST$+w_0$ & \textbf{2.7 $\pm$ 0.2} & \textbf{2.4 $\pm$ 0.2} & \textbf{2.3 $\
 
 %\clearpage
 
-\section{Inference Speed Evaluation}\label{app:speed}
+\section{Inference Speed Evaluation}\label{c4:app:speed}
 
 \begin{table}[h]
   \centering
@@ -1099,11 +900,11 @@ PERSIST$+w_0$ & \textbf{2.7 $\pm$ 0.2} & \textbf{2.4 $\pm$ 0.2} & \textbf{2.3 $\
   WorldMem & 6387.1 \\
   \bottomrule
   \end{tabular}
-  \label{tab:speed-baselines}
+  \label{c4:tab:speed-baselines}
   \vspace{0.5cm}
 \end{table}
 
-We report inference speed comparisons of our PERSIST-S configuration against baselines in \Cref{tab:speed-baselines}. Despite the additional overhead of tracking an explicit 3D state, PERSIST-S is faster because our implementation leverages key-value caching. We also provide a component-wise breakdown in \Cref{tab:speed-components}. As expected, inference is dominated by the iterative denoising processes.
+We report inference speed comparisons of our PERSIST-S configuration against baselines in \Cref{c4:tab:speed-baselines}. Despite the additional overhead of tracking an explicit 3D state, PERSIST-S is faster because our implementation leverages key-value caching. We also provide a component-wise breakdown in \Cref{c4:tab:speed-components}. As expected, inference is dominated by the iterative denoising processes.
 
 \begin{table}[h]
   \centering
@@ -1119,7 +920,7 @@ We report inference speed comparisons of our PERSIST-S configuration against bas
   Projection & 0.63 \\
   \bottomrule
   \end{tabular}
-  \label{tab:speed-components}
+  \label{c4:tab:speed-components}
   \vspace{1cm}
 \end{table}
 
@@ -1127,31 +928,31 @@ Finally, we test an inference configuration of PERSIST-S employing 2 and 4 denoi
 
 While PERSIST does not yet run in real time, we are encouraged by the minimal performance degradation of PERSIST-S and its fast inference configuration compared to the base configuration. We expect that additional speedups achieved through increased spatial and temporal compression, smaller models, and more efficient implementations could enable PERSIST to achieve real-time interactivity. We leave this investigation to future work.
 
-\section{Limitations and Future Work}\label{app:limitations}
+\section{Limitations and Future Work}\label{c4:app:limitations}
 
 \textbf{Training without ground truth 3D supervision.} Our results underscore the critical role of explicit 3D representations in maintaining environmental coherence over long horizons. Currently, however, PERSIST acquires this representation via supervised training, restricting its applicability to simulators or datasets providing 3D annotations~\citep[e.g.][]{zhou2018stereo,Matterport3D,yeshwanth2023scannet++}. A key direction for future work is to relax this dependency by learning 3D representations directly from pixels, or by leveraging recent advances in 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages} to generate synthetic 3D annotations as a pre-processing step.
 
-\textbf{Eliminating exposure bias.} While PERSIST yields substantial improvements in generation quality, temporal stability, and environmental coherence over baselines, human evaluators tend to prefer ground-truth videos in head-to-head comparisons, reporting a gradual degradation in visual quality and environment coherence over time. We attribute this degradation primarily to exposure bias: during training, individual pipeline components ($\gW_\theta$, $\gC_\theta$ and $\gP_\theta$) are trained using ground truth data; at inference, they condition on their own past predictions and on predictions from other components, causing a train-inference distribution mismatch that grows over time. We report examples of generation artifacts that occur over the course of a 2000-step episode in \Cref{fig:limitations}. Leveraging PERSIST's fully differentiable pipeline, future work could explore incorporating an end-to-end post-training stage on generated rollouts, thereby aligning the training and inference distributions. As demonstrated in recent work~\citep{huang2025self}, this approach can be effective in making AR models robust to their own imperfect predictions.
+\textbf{Eliminating exposure bias.} While PERSIST yields substantial improvements in generation quality, temporal stability, and environmental coherence over baselines, human evaluators tend to prefer ground-truth videos in head-to-head comparisons, reporting a gradual degradation in visual quality and environment coherence over time. We attribute this degradation primarily to exposure bias: during training, individual pipeline components ($\gW_\theta$, $\gC_\theta$ and $\gP_\theta$) are trained using ground truth data; at inference, they condition on their own past predictions and on predictions from other components, causing a train-inference distribution mismatch that grows over time. We report examples of generation artifacts that occur over the course of a 2000-step episode in \Cref{c4:fig:limitations}. Leveraging PERSIST's fully differentiable pipeline, future work could explore incorporating an end-to-end post-training stage on generated rollouts, thereby aligning the training and inference distributions. As demonstrated in recent work~\citep{huang2025self}, this approach can be effective in making AR models robust to their own imperfect predictions.
 
 \textbf{Unconstrained spatial memory.} PERSIST presently tracks a finite region of 3D space centred on the agent, causing information from distant locations to be discarded as the agent moves through the environment. To retain spatial information over arbitrarily large environments, future work could consider a conditioning strategy for $\gW_\theta$ based on loading spatial chunks from a 3D memory bank. Whereas pixel memory banks suffer from viewpoint redundancy, a 3D store is inherently deduplicated and spatially organized, offering unique advantages for efficient storage and retrieval of spatial information.
 
-\begin{figure*}
+\begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figs/camera_clip.jpg}
     \caption{Conditioning on the
 ground truth camera trajectory results in physical inconsistency with the world-frame, causing the agent to phase
 through a wall.}
-    \label{fig:camera_clip}
-\end{figure*}
+    \label{c4:fig:camera_clip}
+\end{figure}
 
 
-\begin{figure*}[!htb]
+\begin{figure}[!htb]
   \begin{center}
     \centerline{\includegraphics[width=0.75\linewidth]{figs/w0_generations.png}}
     \caption{PERSIST generates diverse but coherent initial world frames from a single RGB conditioning observation. Each row corresponds to a specific input RGB frame, while each column depicts the initial world frame sampled from $\gW_\theta$ during a specific generation episode.}
-    \label{fig:w0_gen}
+    \label{c4:fig:w0_gen}
   \end{center}
-\end{figure*}
+\end{figure}
 
 \begin{figure}[!htb]
   \centering
@@ -1162,7 +963,7 @@ through a wall.}
 
   % --- Row 1
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s00.png}
@@ -1170,11 +971,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 0 (0 seconds)}. Start of the episode. Generation is stable.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 2
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s28.png}
@@ -1182,11 +983,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 672 (28 seconds)}. A tree trunk disappears from the 3D representation. As a result only the tree foliage is rendered to the left of the agent.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 3
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s37.png}
@@ -1194,11 +995,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 888 (37 seconds)}. Several wood blocks are wrongly predicted by $\gW_\vtheta$ and appear in the 3D representation. They get rendered in the agent's view.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 4
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s54.png}
@@ -1206,11 +1007,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 1296 (54 seconds)}. The texture of the ground is drifting to a yellowish colour. The 3D representation remains stable.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 5
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s55.png}
@@ -1218,11 +1019,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 1320 (55 seconds)}. $\gP_\vtheta$ recovers the correct texture thanks to the grounding provided by $\vw_{2D}$.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 6
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s69.png}
@@ -1230,11 +1031,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 1656 (69 seconds)}. A collision gets mispredicted and the agent clips through a block. The ground texture begins to drift.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 7
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s70.png}
@@ -1242,11 +1043,11 @@ through a wall.}
   \end{minipage}\hfill
   \begin{minipage}[c]{0.55\linewidth}
     \textbf{Step 1680 (70 seconds)}. The model recovers from terrain clipping and texture drift after the agent executes a jump action.
-  \end{minipage}\par\vspace{0.6em}
+  \end{minipage}\par\vspace{0.1em}
 
   % --- Row 8
   \noindent
-  \begin{minipage}[c]{0.35\linewidth}
+  \begin{minipage}[c]{0.26\linewidth}
     \centering
     \begin{tcolorbox}[myimg,width=\linewidth]
     \includegraphics[width=\linewidth]{figs/limitations/s83.png}
@@ -1257,16 +1058,16 @@ through a wall.}
   \end{minipage}
   \end{minipage}
 
-\vspace{0.25cm}
+\vspace{0.05cm}
   \caption{Generation artifacts and subsequent recoveries over a 2000-step (83 seconds) episode generated with PERSIST. The 3D representation drifts locally, causing individual blocks to appear and disappear from the agent's view. However we find that the 3D representation remains globally coherent and has a net stabilising effect on generation, allowing $\gP_\theta$ to recover from visual artifacts. This lets PERSIST generate rollouts lasting thousands of steps, even if glitches become more frequent over time due to autoregressive drift.}
-  \label{fig:limitations}
+  \label{c4:fig:limitations}
 \end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\end{document}
+\end{subappendices}
 
 % This document was modified from the file originally made available by
 % Pat Langley and Andrea Danyluk for ICML-2K. This version was created

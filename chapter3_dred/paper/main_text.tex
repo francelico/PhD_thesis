@@ -1,212 +1,30 @@
-%%%%%%%% ICML 2024 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%% ======================================================================
+%% Chapter 3 (DRED) -- ICML 2024 paper, integrated as native thesis source.
+%% Transformed from the published paper: conference preamble, title/author
+%% block, and bibliography removed; abstract -> "Original Abstract" section;
+%% appendix wrapped in subappendices; cross-ref labels prefixed c3:; full-width
+%% floats un-starred. See the plan and tools/integrate_paper.py.
+%% ======================================================================
+\graphicspath{{chapter3_dred/paper/}{chapter3_dred/paper/content/}{chapter3_dred/paper/app_content/}}
+\renewcommand{\lvl}{i}
 
-\documentclass{article}
-
-% Optional math commands from https://github.com/goodfeli/dlbook_notation.
-\input{math_commands.tex}
-
-% Recommended, but optional, packages for figures and better typesetting:
-\usepackage{microtype}
-\usepackage{graphicx}
-% \usepackage{subfigure} #CHANGED
-\usepackage{booktabs} % for professional tables
-
-% hyperref makes hyperlinks in the resulting PDF.
-% If your build breaks (sometimes temporarily if a hyperlink spans a page)
-% please comment out the following usepackage line and replace
-% \usepackage{icml2024} with \usepackage[nohyperref]{icml2024} above.
-\usepackage[hyphens]{url}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true,breaklinks=true}
-
-
-% Attempt to make hyperref and algorithmic work together better:
-\newcommand{\theHalgorithm}{\arabic{algorithm}}
-
-% Use the following line for the initial blind version submitted for review:
-% \usepackage[underreview]{icml2024}
-% \usepackage{icml2024}
-% If accepted, instead use the following line for the camera-ready submission:
-\usepackage[accepted]{icml2024}
-
-% For theorems and such
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{mathtools}
-\usepackage{amsthm}
-
-% if you use cleveref..
-\usepackage[capitalize,noabbrev]{cleveref}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% THEOREMS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{assumption}[theorem]{Assumption}
-\theoremstyle{remark}
-\newtheorem{remark}[theorem]{Remark}
-
-% MY THEOREM ENVIRONMENTS
-% \newtheorem{theorem}{Theorem}[section]
-% %\theorembodyfont{\upshape}
-% \newtheorem{definition}[theorem]{Definition}
-% \newtheorem{corollary}{Corollary}[theorem]
-% \newtheorem{lemma}[theorem]{Lemma}
-% \newtheorem{proposition}[theorem]{Proposition}
-% \newtheorem{remark}[theorem]{Remark}
-% \newtheorem{conjecture}[theorem]{Conjecture}
-
-% Todonotes is useful during development; simply uncomment the next line
-%    and comment out the line below the next line to turn off comments
-%\usepackage[disable,textsize=tiny]{todonotes}
-\usepackage[textsize=tiny]{todonotes}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MY PACKAGES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% figures
-\usepackage{wrapfig}
-\usepackage{floatflt}
-\usepackage{subcaption}
-
-% algos
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-
-% from ICLR template
-\usepackage{commath}
-
-%REMOVED: subfigure,
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MY COMMANDS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcommand{\rulesep}{\unskip\ \vrule\ }
-
-% % algo stuff
-% \makeatletter
-% % start with some helper code
-% % This is the vertical rule that is inserted
-% \newcommand*{\algrule}[1][\algorithmicindent]{%
-%   \makebox[#1][l]{%
-%     \hspace*{.2em}% <------------- This is where the rule starts from
-%     \vrule height .75\baselineskip depth .25\baselineskip
-%   }
-% }
-
-% \newcount\ALG@printindent@tempcnta
-% \def\ALG@printindent{%
-%     \ifnum \theALG@nested>0% is there anything to print
-%     \ifx\ALG@text\ALG@x@notext% is this an end group without any text?
-%     % do nothing
-%     \else
-%     \unskip
-%     % draw a rule for each indent level
-%     \ALG@printindent@tempcnta=1
-%     \loop
-%     \algrule[\csname ALG@ind@\the\ALG@printindent@tempcnta\endcsname]%
-%     \advance \ALG@printindent@tempcnta 1
-%     \ifnum \ALG@printindent@tempcnta<\numexpr\theALG@nested+1\relax
-%     \repeat
-%     \fi
-%     \fi
-% }
-% % the following line injects our new indent handling code in place of the default spacing
-% \patchcmd{\ALG@doentity}{\noindent\hskip\ALG@tlm}{\ALG@printindent}{}{\errmessage{failed to patch}}
-% \patchcmd{\ALG@doentity}{\item[]\nointerlineskip}{}{}{} % no spurious vertical space
-% % end vertical rule patch for algorithmicx
-% \makeatother
+%% Macros the body uses that lived in the paper's (stripped) preamble.
+%% \Input/\Output are \def'd (not \newcommand) because chapter 4 redefines them
+%% with a different arity; reading order makes the last definition the right one
+%% for each chapter's algorithms.
 \algrenewcommand\algorithmicindent{1.0em}
 \algrenewcommand\algorithmicrequire{\textbf{Input:}}
 \algrenewcommand\algorithmicensure{\textbf{Output:}}
 \algsetblock[Name]{Init}{6553}{0}{0cm}
 \algdefaulttext[Name]{Into}
-\newcommand{\Input}{\Require}
-\newcommand{\Output}{\Ensure}
-
-% from iclr template
+\def\Input{\Require}
+\def\Output{\Ensure}
+\newcommand{\rulesep}{\unskip\ \vrule\ }
 \newlength{\twosubht}
 \newsavebox{\twosubbox}
 
-% The \icmltitle you define below is probably too long as a header.
-% Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{Data-Regularised Environment Design}
-
-\begin{document}
-
-\twocolumn[
-\icmltitle{DRED: Zero-Shot Transfer in Reinforcement Learning via \\ Data-Regularised Environment Design}
-
-% TODO - Camera ready:
-% - update Minigrid figures with new results
-% - include table with all procgen and minigrid results
-% - include plots of train / test performance over time for minigrid and procgen
-% - consider moving to extra page: method diagram, some of the extra analysis
-% - consider adding reference to manifold hypothesis
-% - consider running additional ablation DRED-V + eta = 1 OR DRED-E + eta =1
-% - Link to repo, data
-
-
-% It is OKAY to include author information, even for blind
-% submissions: the style file will automatically remove it for you
-% unless you've provided the [accepted] option to the icml2024
-% package.
-
-% List of affiliations: The first argument should be a (short)
-% identifier you will use later to specify author affiliations
-% Academic affiliations should list Department, University, City, Region, Country
-% Industry affiliations should list Company, City, Region, Country
-
-% You can specify symbols, otherwise they are numbered in order.
-% Ideally, you should not use this facility. Affiliations will be numbered
-% in order of appearance and this is the preferred way.
-\icmlsetsymbol{equal}{*}
-
-\begin{icmlauthorlist}
-\icmlauthor{Samuel Garcin}{edi}
-\icmlauthor{James Doran}{huaw}
-\icmlauthor{Shangmin Guo}{edi}
-\icmlauthor{Christopher G. Lucas}{edi}
-\icmlauthor{Stefano V. Albrecht}{edi}
-\end{icmlauthorlist}
-
-\icmlaffiliation{edi}{School of Informatics, University of Edinburgh}
-\icmlaffiliation{huaw}{Huawei}
-
-\icmlcorrespondingauthor{Samuel Garcin}{s.garcin@ed.ac.uk}
-
-% You may provide any keywords that you
-% find helpful for describing your paper; these are used to populate
-% the "keywords" metadata in the PDF but will not be shown in the document
-\icmlkeywords{Reinforcement learning, Zero-shot transfer, Zero-shot generalisation, Environment design, Generative modelling}
-
-\vskip 0.3in
-]
-
-% this must go after the closing bracket ] following \twocolumn[ ...
-
-% This command actually creates the footnote in the first column
-% listing the affiliations and the copyright notice.
-% The command takes one argument, which is text to display at the start of the footnote.
-% The \icmlEqualContribution command is standard text for equal contribution.
-% Remove it (just {}) if you do not need this facility.
-
-\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
-% \printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
-
-
-%open-review compatible abstract
-% Autonomous agents trained using deep reinforcement learning (RL) often lack the ability to successfully generalise to new environments, even when these environments share characteristics with the ones they have encountered during training. In this work, we investigate how the sampling of individual environment instances, or levels, affects the zero-shot generalisation (ZSG) ability of RL agents. We discover that, for deep actor-critic architectures sharing their base layers, prioritising levels according to their value loss minimises the mutual information between the agent's internal representation and the set of training levels in the generated training data. This provides a novel theoretical justification for the regularisation achieved by certain adaptive sampling strategies. We then turn our attention to unsupervised environment design (UED) methods, which assume control over level generation. We find that existing UED methods can significantly shift the training distribution, which translates to low ZSG performance. To prevent both overfitting and distributional shift, we introduce *data-regularised environment design* (DRED). DRED generates levels using a generative model trained to approximate the ground truth distribution of an initial set of level parameters. Through its grounding, DRED achieves significant improvements in ZSG over adaptive level sampling strategies and UED methods.
-
-\begin{abstract}
+\section{Original Abstract}
 Autonomous agents trained using deep reinforcement learning (RL) often lack the ability to successfully generalise to new environments, even when these environments share characteristics with the ones they have encountered during training. In this work, we investigate how the sampling of individual environment instances, or levels, affects the zero-shot generalisation (ZSG) ability of RL agents. We discover that, for deep actor-critic architectures sharing their base layers, prioritising levels according to their value loss minimises the mutual information between the agent's internal representation and the set of training levels in the generated training data. This provides a novel theoretical justification for the regularisation achieved by certain adaptive sampling strategies. We then turn our attention to unsupervised environment design (UED) methods, which assume control over level generation. We find that existing UED methods can significantly shift the training distribution, which translates to low ZSG performance. To prevent both overfitting and distributional shift, we introduce \textit{data-regularised environment design} (DRED). DRED generates levels using a generative model trained to approximate the ground truth distribution of an initial set of level parameters. Through its grounding, DRED achieves significant improvements in ZSG over adaptive level sampling strategies and UED methods.
-\end{abstract}
 
 % \section{Outline}
 
@@ -218,63 +36,63 @@ Autonomous agents trained using deep reinforcement learning (RL) often lack the 
 %APP
 % - App: results table for Procgen and Minigrid exp TODO
 
-\section{Introduction}\label{sec:intro}
+\section{Introduction}\label{c3:sec:intro}
 % \vspace{-.5em}
 % \begin{wrapfigure}[]{r}{0.5\textwidth}
 \begin{figure}[bht]
     \centering
     % \vspace{-.5cm}
-    \begin{subfigure}{0.24\linewidth}
+    \begin{subfigure}{0.16\linewidth}
         \includegraphics[width=.95\linewidth]{content/layouts/lvl_a.png}
         \caption{}
-        \label{subfig:lvla}
+        \label{c3:subfig:lvla}
     \end{subfigure}%
-    \begin{subfigure}{0.24\linewidth}
+    \begin{subfigure}{0.16\linewidth}
         \includegraphics[width=.95\linewidth]{content/layouts/lvl_b.png}
         \caption{}
-        \label{subfig:lvlb}
+        \label{c3:subfig:lvlb}
     \end{subfigure}%
-        \begin{subfigure}{0.24\linewidth}
+        \begin{subfigure}{0.16\linewidth}
         \includegraphics[width=.95\linewidth]{content/layouts/lvl_c.png}
         \caption{}
-        \label{subfig:lvlc}
+        \label{c3:subfig:lvlc}
     \end{subfigure}%
     \hspace{-3pt}
     \rulesep
-    \begin{subfigure}{0.24\linewidth}
+    \begin{subfigure}{0.16\linewidth}
         \includegraphics[width=0.95\linewidth]{content/layouts/lvl_d.png}
         \caption{}
-        \label{subfig:lvld}
+        \label{c3:subfig:lvld}
     \end{subfigure}%
     % \vspace{-.2cm}
     \caption{The agent (yellow) must navigate to the goal (green) but cannot pass through walls (grey) and only observes tiles directly adjacent to itself (highlighted yellow). An agent trained over levels (a)-(c) will transfer zero-shot to level (d) if it has learnt a behavior adapted to the task semantics of following blue tiles to the goal location.
     }
-    \label{fig:CMDPex}
+    \label{c3:fig:CMDPex}
     % \vspace{-.4cm}
 % \end{wrapfigure}
 \end{figure}
 A central challenge facing modern reinforcement learning (RL) is learning policies capable of zero-shot transfer of learned behaviours to a wide range of environment settings. Prior applications of RL algorithms \citep{rubiks,CLrobloc,fastCLrobloc} indicate that strong zero-shot generalisation (ZSG) can be achieved through an adaptive sampling strategy over the set of environment instances available during training, which we refer to as the set of training \textit{levels}. However, the relationship between ZSG and the level sampling process remains poorly understood. In this work, we draw novel connections between this process and the minimisation of an upper bound on the generalisation error. This bound depends on the \textit{mutual information} (MI) between the learned policy $\pi$ and the set of training levels $L$,
-% \begin{equation} \label{eq:MI}
+% \begin{equation} \label{c3:eq:MI}
 %     \mut{\pi}{L} = \sum_{i\in L} \int P(\Delta\mathcal{A} = \pi ,I=i) \log \frac{P(\Delta\mathcal{A} = \pi ,I=i)}{P(\Delta\mathcal{A} = \pi) P(I=i)}dP_{\Delta \mathcal{A}}(\pi)
 % \end{equation}
-% \begin{equation} \label{eq:MI}
+% \begin{equation} \label{c3:eq:MI}
 %     \mut{\pi}{L} = \sum_{i\in L} \int P(\Pi = \pi ,I=i) \log \frac{P(\Pi = \pi ,I=i)}{P(\Pi = \pi) P(I=i)}dP_{\Pi}(\pi)
 % \end{equation}
-\begin{equation} \label{eq:MI}
+\begin{equation} \label{c3:eq:MI}
 \noindent
     \mut{\pi}{L} = \entropy(\ri) + \sum_{i\in L} \int_{\bar{\pi} \in \Delta^\sA}\hspace{-1em} P(\pi{=}\bar{\pi}, \ri{=}i) \log P(\ri{=}i |\pi{=}\bar{\pi}),
 \end{equation}
-where $i$ refers to an individual training level, $\entropy(\ri)$ the entropy of the level distribution and $\Delta^\sA$ the output space of the policy. A model with high $\mut{\pi}{L}$ outputs action distributions that are highly correlated to the level identity. In other words, the model internally predicts the level it is currently in and learns an ensemble of level-specific policies. In general, such an agent will not transfer to new levels zero-shot, as illustrated in the minimal example in \Cref{fig:CMDPex}. In this scenario, it is possible to identify a training level from its initial observation. An agent with high $\mut{\pi}{L}$ would use this information to infer the goal location without having to observe it first. In doing so, it can ignore the task semantics shared across levels, while still maximising its returns on the training set. In fact, it can solve level (a) in fewer steps by ignoring these semantics, as there exists a ``shortcut'' unique to (a). When deployed on (d) after training, the agent will predict it is in (a), since (a) and (d) share the same initial observation. As a result the agent is likely to follow the (a)-specific policy, which will not transfer zero-shot.
+where $i$ refers to an individual training level, $\entropy(\ri)$ the entropy of the level distribution and $\Delta^\sA$ the output space of the policy. A model with high $\mut{\pi}{L}$ outputs action distributions that are highly correlated to the level identity. In other words, the model internally predicts the level it is currently in and learns an ensemble of level-specific policies. In general, such an agent will not transfer to new levels zero-shot, as illustrated in the minimal example in \Cref{c3:fig:CMDPex}. In this scenario, it is possible to identify a training level from its initial observation. An agent with high $\mut{\pi}{L}$ would use this information to infer the goal location without having to observe it first. In doing so, it can ignore the task semantics shared across levels, while still maximising its returns on the training set. In fact, it can solve level (a) in fewer steps by ignoring these semantics, as there exists a ``shortcut'' unique to (a). When deployed on (d) after training, the agent will predict it is in (a), since (a) and (d) share the same initial observation. As a result the agent is likely to follow the (a)-specific policy, which will not transfer zero-shot.
 
-As extensively demonstrated in prior work, increasing the number of training levels \citep{OverfittingDRL,procgen,Packer2018AssessingGI} or the amount of data generated in each level (e.g. performing data augmentation on observations \citep{raileanu2021UCB-DrAC,Kostrikov2021ImageAllYouNeed}) reduces the generalisation error, also called \textit{generalisation gap}, defined as the difference in episodic returns when evaluating the agent on the train set and on the full level distribution. From an information theoretic perspective, these approaches induce an implicit information bottleneck on $\mut{\pi}{L}$ by making any particular level more difficult to identify for a model with a fixed representational capacity. However, it is not clear how certain level sampling strategies achieve smaller generalisation gaps (compared to uniform sampling) without increasing the number of training levels nor augmenting the data generated \citep{PLR,Robust-PLR}. In \Cref{sec:procgen}, we show that these strategies may be understood as adaptive rejection sampling mechanisms that prevent data with high $\mut{\pi}{L}$ from being generated. This allows us to build a connection between these strategies and the minimisation of an upper bound on the generalisation gap that depends on $\mut{\pi}{L}$. We supplement our findings with an empirical evaluation of different sampling strategies in the Procgen benchmark \citep{procgen}, and observe a strong correlation between $\mut{\pi}{L}$ and the generalisation gap.
+As extensively demonstrated in prior work, increasing the number of training levels \citep{OverfittingDRL,procgen,Packer2018AssessingGI} or the amount of data generated in each level (e.g. performing data augmentation on observations \citep{raileanu2021UCB-DrAC,yarats2021image}) reduces the generalisation error, also called \textit{generalisation gap}, defined as the difference in episodic returns when evaluating the agent on the train set and on the full level distribution. From an information theoretic perspective, these approaches induce an implicit information bottleneck on $\mut{\pi}{L}$ by making any particular level more difficult to identify for a model with a fixed representational capacity. However, it is not clear how certain level sampling strategies achieve smaller generalisation gaps (compared to uniform sampling) without increasing the number of training levels nor augmenting the data generated \citep{PLR,Robust-PLR}. In \Cref{c3:sec:procgen}, we show that these strategies may be understood as adaptive rejection sampling mechanisms that prevent data with high $\mut{\pi}{L}$ from being generated. This allows us to build a connection between these strategies and the minimisation of an upper bound on the generalisation gap that depends on $\mut{\pi}{L}$. We supplement our findings with an empirical evaluation of different sampling strategies in the Procgen benchmark \citep{procgen}, and observe a strong correlation between $\mut{\pi}{L}$ and the generalisation gap.
 
-We then introduce \textit{data-regularised environment design} (DRED) in \Cref{sec:ssed}. DRED combines adaptive sampling with data augmentation, but does not perform data augmentation across observations but across \textit{levels}. It does so by learning a generative model of the full distribution of levels we would like the agent to transfer to, trained on a limited starting set of levels from that distribution. DRED then employs an adaptive sampling strategy over an augmented set consisting of the starting levels and the generated levels.
+We then introduce \textit{data-regularised environment design} (DRED) in \Cref{c3:sec:ssed}. DRED combines adaptive sampling with data augmentation, but does not perform data augmentation across observations but across \textit{levels}. It does so by learning a generative model of the full distribution of levels we would like the agent to transfer to, trained on a limited starting set of levels from that distribution. DRED then employs an adaptive sampling strategy over an augmented set consisting of the starting levels and the generated levels.
 
 While training on an augmented set is effective in preventing overfitting, it may cause distributional shift if that set is not drawn from the same distribution as the original set. We find that existing environment design methods that rely on an unsupervised generation process cause significant distributional shift, and may lead to poor performance at test time. There is therefore a trade-off between augmenting the training set to prevent instance-overfitting (i.e. to prevent learning level-specific policies), and ensuring that this augmented set is consistent with the original distribution (i.e. to avoid distributional shift). We measure DRED's capabilities in a gridworld navigation task that was designed to highlight this trade-off. We find that DRED achieves a smaller generalisation gap than sampling methods restricted to the starting levels, and does so while maintaining a small distributional shift. This differentiates DRED from unsupervised environment design (UED) methods, which do not account for a target task or target distribution. DRED achieves significant improvements in the agent's ZSG capabilities, reaching 1.2 times the returns of the next best baseline on held-out levels. It also improves performance by two to three times on more difficult instantiations of the target task.\footnote{Our code and experimental data are available at \url{https://github.com/uoe-agents/dred}.} %TODO: check new results for ratios
 
 %On the one hand, we observe lower instance-overfitting with DRED than when training over the original level set, even adaptively. On the other hand, DRED generate levels with lower distributional shift than other environment design methods, and avoids over-generalisation. 
 % \vspace{-.5em}
-\section{Preliminaries}\label{sec:bg}
+\section{Preliminaries}\label{c3:sec:bg}
 % \vspace{-.5em}
 % - Contextual and underspecified POMDPs, instance specific value functions, ZSG: OK
 % - UED, task generators
@@ -290,28 +108,28 @@ We assume access to a parametrisable simulator with parameter space $\sX$, with 
 % We assume access to a simulator capable of expressing a CMDP instance as a \textit{level} parametrised by level parameter $\rvx$. In other words we assume the existence of a mapping from the context space to the level parameter space $X$, and we assume we have access to a finite set of training levels $L$ corresponding to a subset $C_{\text{train}}$ (if the CMDP is defined under a distribution of contexts we also assume elements of $C_{\text{train}}$ have been sampled from $p(c)$. We do not make any strong assumption on the mapping function: the mapping function may be partial (i.e. not every context is instantiable by the simulator), many-to-one or one-to-many, and its codomain may be a subset of $X$ (i.e. there are levels that do not correspond to any contexts of the CMDP). The level parameter space may consist of a set of random seeds (e.g. fully procedural environments such as \citet{procgen}) or a collection of explicitly defined environment parameters (e.g. parametrised environments such as \citet{gym_minigrid, minihack}).
 
 \textbf{The generalisation gap.} We start training with access to a limited set of level parameters $X_{\text{train}}\subset \sX_C$ sampled from $p(\rvx)$, and evaluate generalisation using a set of held-out level parameters $X_{\text{test}}$, also sampled from $p(\rvx)$. We can estimate generalisation error using a formulation reminiscent of supervised learning,
-\begin{equation} \label{eq:GenGap}
+\begin{equation} \label{c3:eq:GenGap}
     \text{GenGap}(\pi) \coloneqq \frac{1}{|X_{\text{train}}|} \sum_{\vx \in X_{\text{train}}} V^\pi_{\lvl_\vx} - \frac{1}{|X_{\text{test}}|}\sum_{\vx \in X_{\text{test}}} V^\pi_{\lvl_\vx}.
 \end{equation}
 
 \citet{instance_invariant} extend generalisation results in the supervised setting \citep{MI_gengap_SL} to obtain an upper bound for the $\text{GenGap}$. 
-\begin{theorem}\label{th:gen_gap}
+\begin{theorem}\label{c3:th:gen_gap}
   For any CMDP such that $|V^\pi_C (H_t^o)| \leq D/2,\forall H_t^o, \pi$, with $D$ being a constant, then for any set of training levels $L$, and policy $\pi$
-\begin{equation}\label{eq:GenGap_bound}
+\begin{equation}\label{c3:eq:GenGap_bound}
    \text{GenGap}(\pi) \leq \sqrt{\frac{2D^2}{|L|} \times \mut{L}{\pi}}.
 \end{equation}   
 \end{theorem}
 We will show that minimising this bound is an effective surrogate objective for reducing the $\text{GenGap}$. 
 
 \textbf{Adaptive level sampling.} We study the connection between $\mut{L}{\pi}$ and adaptive sampling strategies over $L$. Prioritised Level Replay \citep[PLR,][]{PLR} introduce a scoring function $\textbf{score}(\tau_i, \pi)$ which compute level scores from trajectory rollouts $\tau_i$. Scores are used to define an adaptive sampling distribution over a level buffer $\Lambda$, with
-\begin{equation}\label{eq:plr_buffer_dist}
+\begin{equation}\label{c3:eq:plr_buffer_dist}
     P_\Lambda = (1 - \rho) \cdot P_S + \rho \cdot P_R,
 \end{equation}
 where $P_S$ is a distribution parametrised by the level scores and $\rho$ is a coefficient mixing $P_S$ with a staleness distribution $P_R$ that promotes levels replayed less recently. \citet{PLR} experiment with different scoring functions, and empirically find that the scoring function based on the $\ell_1$-value loss $S^V_i = \textbf{score}(\tau_i, \pi) = (1 / |\tau_i|) \sum_{H_t^o\in\tau_i} |\hat{V} (H_t^o) - V^\pi_i (H_t^o) |$ incurs a significant reduction in the $\text{GenGap}$ at test time. 
 
-In the remaining sections, we draw novel connections between the $\ell_1$-value loss prioritisation strategy and the minimisation of $\mut{L}{\pi}$. We then introduce DRED, a level generation and sampling framework training the agent over an augmented set of levels. DRED jointly minimises $\mut{L}{\pi}$ while increasing $|L|$ and as such is more effective at minimising the bound from \Cref{th:gen_gap}.
+In the remaining sections, we draw novel connections between the $\ell_1$-value loss prioritisation strategy and the minimisation of $\mut{L}{\pi}$. We then introduce DRED, a level generation and sampling framework training the agent over an augmented set of levels. DRED jointly minimises $\mut{L}{\pi}$ while increasing $|L|$ and as such is more effective at minimising the bound from \Cref{c3:th:gen_gap}.
 % \vspace{-.5em}
-\section{How does adaptive level sampling impact generalisation in RL?} \label{sec:procgen}
+\section{How does adaptive level sampling impact generalisation in RL?} \label{c3:sec:procgen}
 % \vspace{-.5em}
 %- Adaptive instance sampling minimises mutual information more effectively than random sampling
 
@@ -335,12 +153,12 @@ In the remaining sections, we draw novel connections between the $\ell_1$-value 
 
 % - Then discuss mutual information strategies and show they do not work as well as value loss due to curriculum effect
 %
-\begin{figure*}[tb]
+\begin{figure}[tb]
     % \centering
             \includegraphics[width=1\linewidth]{content/procgen/procgen_aggregates_gengap_MI_train_test.pdf}
-    \caption{Aggregated $\mut{L}{b}$, $\text{GenGap}$, train and test scores of different sampling strategies over 5 seeds across all Procgen games, using the rliable library \citep{rliable}. Coloured boxes indicate the 95\% confidence interval. For each game, the train and test scores and the $\text{GenGap}$ are normalised by the mean score of $(P_S = \mathcal{U})$ over the test set. Per-game scores, mutual information and classifier accuracy are reported in \Cref{app:results_procgen}, and \Cref{app:procgen} provides an extended description of our experimental setup.}
-    \label{fig:procgen_results}
-\end{figure*}
+    \caption{Aggregated $\mut{L}{b}$, $\text{GenGap}$, train and test scores of different sampling strategies over 5 seeds across all Procgen games, using the rliable library \citep{rliable}. Coloured boxes indicate the 95\% confidence interval. For each game, the train and test scores and the $\text{GenGap}$ are normalised by the mean score of $(P_S = \mathcal{U})$ over the test set. Per-game scores, mutual information and classifier accuracy are reported in \Cref{c3:app:results_procgen}, and \Cref{c3:app:procgen} provides an extended description of our experimental setup.}
+    \label{c3:fig:procgen_results}
+\end{figure}
 %
 In this section, we establish that adaptive sampling strategies reduce the $\text{GenGap}$ by inducing an \textit{information bottleneck} on $\mut{L}{\pi}$. We begin our analysis by deriving a method for empirically estimating an upper bound for $\mut{L}{\pi}$. We find this upper bound and the generalisation gap to be well correlated for different sampling strategies in the Procgen benchmark \citep{procgen}, a benchmark of 16 games designed to measure generalisation in RL. As in prior work \citep{PLR}, we observe that $\ell_1$-value loss prioritisation reduces the $\text{GenGap}$ while improving sample efficiency. Here we take a further step, and aim to understand \textit{why} value loss prioritisation minimises the $\text{GenGap}$.\footnote{For a discussion on the relationship of value loss and sample efficiency, we refer the reader to \citet{Schaul2015PrioritizedER}.} We do so by establishing a connection between the value loss and $\mut{L}{\pi}$. We conclude this section by highlighting the importance of maintaining a low distributional shift during training, an important feature of DRED, which we will introduce in the next section.
 %
@@ -349,31 +167,31 @@ In this section, we establish that adaptive sampling strategies reduce the $\tex
 % \vspace{-.5em}
 $\mut{L}{\pi}$ is often difficult to measure from the model outputs alone. We estimate instead $\mut{L}{b}$, the mutual information at the last shared layer between the actor and critic. As shown in the following lemma, $\mut{L}{b}$ upper bounds $\mut{L}{\pi}$.
 %
-\begin{lemma} \label{lem:mi_fixed_L}
+\begin{lemma} \label{c3:lem:mi_fixed_L}
     (proof in appendix) Given a set of training levels $L$ and policy $\pi = f \circ b$, where $b(H^o_t) = h_t \in \sB$ is an intermediate representation function and $f : \sB \rightarrow \Delta^\sA$ maps to the agent's action distribution, we have
-    \begin{align} \label{eq:lemma_result}
+    \begin{align} \label{c3:eq:lemma_result}
         \mut{L}{\pi} \leq \entropy(\ri) + \sum_{i\in L} \int_{\sB} p(h, i) \log p(i|h)dh,
     \end{align}
     where the right-hand side is equivalent to $\mut{L}{b}$.
 \end{lemma}
-This result applies to any state representation function $b$, including the non-recurrent case where $b(H^o_t) = b(o_t)$. To remain consistent with the CMDP, we must set $p(\ri)$ to $p(\rvx)$, making the entropy $\entropy(\ri)$ a constant. However, the second term in \Cref{eq:lemma_result} %is the log-likelihood of a classifier predicting the level identity from the output of $b$, and therefore 
+This result applies to any state representation function $b$, including the non-recurrent case where $b(H^o_t) = b(o_t)$. To remain consistent with the CMDP, we must set $p(\ri)$ to $p(\rvx)$, making the entropy $\entropy(\ri)$ a constant. However, the second term in \Cref{c3:eq:lemma_result} %is the log-likelihood of a classifier predicting the level identity from the output of $b$, and therefore 
 depends on the output of the learned representation $b_\vtheta$, and may be empirically estimated as
 %
-\begin{equation} \label{eq:mi_empirical_approx}
+\begin{equation} \label{c3:eq:mi_empirical_approx}
    \sum_{i\in L} \int_{\sB} p(h, i) \log p(i|h)dh \approx \frac{1}{N} \sum^{N}_{n} \log p_\vtheta(i^{(n)}|\vh^{(n)}),
 \end{equation}
 where $p_\vtheta$ predicts the current level from representations $\vh_t = b_\vtheta (H_t^o)$ collected during rollouts.
 
-\subsection{Comparing adaptive sampling strategies} \label{sec:procgen_exp}
-To evaluate their impact on the $\text{GenGap}$, we compare different adaptive sampling strategies in the ``easy'' setting of Procgen ($|L|=200$, $25M$ timesteps).  We use the default PPO \citep{PPO} architecture and hyperparameters proposed by \citet{procgen}, which uses a non-recurrent intermediate representation $b_\vtheta (o_t)$. We measure $\mut{L}{b}$ using \Cref{eq:mi_empirical_approx}, parametrising $p_\vtheta$ as a linear classifier.
+\subsection{Comparing adaptive sampling strategies} \label{c3:sec:procgen_exp}
+To evaluate their impact on the $\text{GenGap}$, we compare different adaptive sampling strategies in the ``easy'' setting of Procgen ($|L|=200$, $25M$ timesteps).  We use the default PPO \citep{PPO} architecture and hyperparameters proposed by \citet{procgen}, which uses a non-recurrent intermediate representation $b_\vtheta (o_t)$. We measure $\mut{L}{b}$ using \Cref{c3:eq:mi_empirical_approx}, parametrising $p_\vtheta$ as a linear classifier.
 % \vspace{-.5em}
-\Cref{fig:procgen_results} compares uniform sampling $(P_S=\mathcal{U})$ with adaptive sampling strategies obtained from different level scoring functions in \Cref{eq:buffer_dist}. We compare value loss scoring $(S=S^V)$ with $(S=S^{\text{MI}})$, a scoring function that directly prioritises levels with low $\mut{L}{b}$. $(S=S^{\text{MI}})$ exploits that \Cref{eq:mi_empirical_approx} may be decomposed into level specific terms $I_i = \sum_{t}^T \log p_\vtheta(i|b_\vtheta(o_t))$ and uses scoring strategy $\textbf{score}(\tau_i, \pi) = I_i$. 
+\Cref{c3:fig:procgen_results} compares uniform sampling $(P_S=\mathcal{U})$ with adaptive sampling strategies obtained from different level scoring functions in \Cref{c3:eq:buffer_dist}. We compare value loss scoring $(S=S^V)$ with $(S=S^{\text{MI}})$, a scoring function that directly prioritises levels with low $\mut{L}{b}$. $(S=S^{\text{MI}})$ exploits that \Cref{c3:eq:mi_empirical_approx} may be decomposed into level specific terms $I_i = \sum_{t}^T \log p_\vtheta(i|b_\vtheta(o_t))$ and uses scoring strategy $\textbf{score}(\tau_i, \pi) = I_i$. 
 
-We also consider mixed strategies $(S=S^V, S^\prime=S^{\text{MI}})$ and $(S=S^V, P_{S^\prime}=\mathcal{U})$, which are obtained by introducing a secondary scoring function to \Cref{eq:plr_buffer_dist},
-\begin{equation} \label{eq:buffer_dist}
+We also consider mixed strategies $(S=S^V, S^\prime=S^{\text{MI}})$ and $(S=S^V, P_{S^\prime}=\mathcal{U})$, which are obtained by introducing a secondary scoring function to \Cref{c3:eq:plr_buffer_dist},
+\begin{equation} \label{c3:eq:buffer_dist}
     P_\Lambda = (1 - \rho) \cdot ((1-\eta) \cdot  P_S + \eta \cdot P_{S^\prime}) + \rho \cdot P_R,
 \end{equation}
-where $\eta$ is the mixing coefficient, which may be scheduled over the course of training. We report our main observations below, with extended analysis and results available in \Cref{app:results_procgen}.
+where $\eta$ is the mixing coefficient, which may be scheduled over the course of training. We report our main observations below, with extended analysis and results available in \Cref{c3:app:results_procgen}.
     
     \textbf{First observation.} Minimising $\mut{L}{b}$ on the generated training data using an adaptive distribution results in agent representations with reduced $\mut{L}{b}$ under the \textit{original distribution}.
     
@@ -381,7 +199,7 @@ where $\eta$ is the mixing coefficient, which may be scheduled over the course o
     
     \textbf{Third observation.} We measure a strong positive correlation $(\rho=0.6)$ and rank correlation (Kendall $\xi=0.5$, $p<1e-50$) between $\mut{L}{b}$ and the $\text{GenGap}$, across all procgen games and sampling strategies tested. This makes $\mut{L}{b}$ a useful proxy for the $\text{GenGap}$. $\mut{L}{b}$ has lower variance, does not require normalisation across environments and, crucially, \textit{does not necessitate a held-out test set of levels} to be measured.
     
-    \textbf{Fourth observation.} $(S=S^{\text{MI}})$ achieves the highest reductions in $\mut{L}{b}$ and the $\text{GenGap}$. However, it also significantly degrades performance during training, and is the worst performing strategy when considering final test scores. This result is consistent with \Cref{th:gen_gap} and \Cref{lem:mi_fixed_L}, as $\mut{L}{b}$ bounds the GenGap and not the test returns.\footnote{Excessive data regularisation is not desirable: in the most extreme case, destroying all information contained within the training data would guarantee $\mut{L}{b} = \text{GenGap} = 0$ but it would also make the performance on the train and test sets equally bad.} $(S=S^V)$ strikes a good balance between improving sample efficiency and reducing the $\text{GenGap}$. Indeed, our best performing mixing schedule for $(S=S^V, S^\prime=S^{\text{MI}})$ (reported here) only achieved a very marginal (and not statistically significant) improvement in test score and $\text{GenGap}$ over $(S=S^V)$.
+    \textbf{Fourth observation.} $(S=S^{\text{MI}})$ achieves the highest reductions in $\mut{L}{b}$ and the $\text{GenGap}$. However, it also significantly degrades performance during training, and is the worst performing strategy when considering final test scores. This result is consistent with \Cref{c3:th:gen_gap} and \Cref{c3:lem:mi_fixed_L}, as $\mut{L}{b}$ bounds the GenGap and not the test returns.\footnote{Excessive data regularisation is not desirable: in the most extreme case, destroying all information contained within the training data would guarantee $\mut{L}{b} = \text{GenGap} = 0$ but it would also make the performance on the train and test sets equally bad.} $(S=S^V)$ strikes a good balance between improving sample efficiency and reducing the $\text{GenGap}$. Indeed, our best performing mixing schedule for $(S=S^V, S^\prime=S^{\text{MI}})$ (reported here) only achieved a very marginal (and not statistically significant) improvement in test score and $\text{GenGap}$ over $(S=S^V)$.
     
     \textbf{Fifth observation.} Under $(S=S^V, P_{S^\prime}=\mathcal{U})$ training scores are similar to $(S=S^V)$ but both the $\text{GenGap}$ and $\mut{L}{b}$ increase. We hypothesise that the mechanisms responsible for improving sample efficiency and generalisation in $(S=S^V)$ are different, and that the latter is achieved through adaptive $\mut{L}{b}$ regularisation.
 % \vspace{-.5em}
@@ -396,16 +214,16 @@ While it is intuitive that an adaptive strategy such as $(S=S^{\text{MI}})$ mini
 
 We can estimate the value function $V^\pi_C$ of a CMDP from level specific value functions $V^\pi_{\lvl}$ by employing the unbiased value estimator lemma from \citet{instance_invariant}.
 
-\begin{lemma}\label{lem:unbiased_value_estimator}
+\begin{lemma}\label{c3:lem:unbiased_value_estimator}
     Given a policy $\pi$ and a set of levels $L$ from a CMDP, we have $\forall H_t^o$  $(t < \infty)$ compatible with $L$ (meaning that the observation sequence $H_t^o$ occurs in $L$), $\mathbb{E}_{L|H_t^o}[V^\pi_{\lvl}(H_t^o)] = V^\pi_C(H_t^o)$, with $V^\pi_{\lvl}(H_t^o)$ being the expected returns under $\pi$ given observation history $H_t^o$ in a given level $\lvl$, and $V^\pi_C(H_t^o)$ being the expected returns across all possible occurrences of $H_t^o$ in the CMDP.
 \end{lemma}
 It follows that the value prediction loss also employs level-specific targets, with 
-\begin{equation} \label{eq:Lv}
+\begin{equation} \label{c3:eq:Lv}
     L_{V}(\vtheta) = \frac{1}{N} \sum_{n}^N (\hat{V}_\vtheta({H_t^{o}}^{(n)}) - {V^\pi_{i}}^{(n)})^2,
 \end{equation}
-and \Cref{lem:unbiased_value_estimator} guaranteeing convergence to an unbiased estimator for $V^\pi_C$ when minimising \Cref{eq:Lv}. 
+and \Cref{c3:lem:unbiased_value_estimator} guaranteeing convergence to an unbiased estimator for $V^\pi_C$ when minimising \Cref{c3:eq:Lv}. 
 
-Equivalently, we can express each level-specific value function $V^\pi_{i}$ as a combination of the CMDP value function $V^\pi_C$ and a level-specific function $v^\pi_i$, \Cref{lem:unbiased_value_estimator} ensuring that the $v^\pi_i$ functions cancel out in expectation. Nevertheless, when $v^\pi_i$ is not zero everywhere, identifying the current level $i$ and predicting $v^\pi_i$ are both necessary to predict individual value targets $V^\pi_i$. Perfect value prediction over the training levels (i.e. overfitting and reaching zero value loss) therefore necessitates learning an intermediate representation from which the current level $i$ is identifiable, implying high $\mut{L}{b}$. It follows that, by rejecting levels with low value loss, value loss prioritisation prevents the agent from collecting data from the levels in which $b$ has begun to overfit. 
+Equivalently, we can express each level-specific value function $V^\pi_{i}$ as a combination of the CMDP value function $V^\pi_C$ and a level-specific function $v^\pi_i$, \Cref{c3:lem:unbiased_value_estimator} ensuring that the $v^\pi_i$ functions cancel out in expectation. Nevertheless, when $v^\pi_i$ is not zero everywhere, identifying the current level $i$ and predicting $v^\pi_i$ are both necessary to predict individual value targets $V^\pi_i$. Perfect value prediction over the training levels (i.e. overfitting and reaching zero value loss) therefore necessitates learning an intermediate representation from which the current level $i$ is identifiable, implying high $\mut{L}{b}$. It follows that, by rejecting levels with low value loss, value loss prioritisation prevents the agent from collecting data from the levels in which $b$ has begun to overfit. 
 
 In other words, value loss prioritisation acts as a form of \textit{rejection sampling} that prevents data with high $\mut{L}{b}$ from being generated. This rejection sampling is adaptive, as $L_V(\vtheta)$ depends on the current learned weights $\vtheta$, and thus continually resists convergence to a representation overfitting to any particular level.
 % \vspace{-.5em}
@@ -427,30 +245,30 @@ In other words, value loss prioritisation acts as a form of \textit{rejection sa
     \begin{subfigure}[]{0.49\linewidth}
     \includegraphics[width=1\linewidth]{content/procgen/numlvl/numlvl_shiftgap_diffs.pdf}
     \end{subfigure}
-    \caption{Investigating the effect of increasing $|L|$ when adaptive sampling induces distributional shift. Top row reports the test and train performance; the $\text{GenGap}$ is on the bottom left; on the bottom right is compared, for $(S=S^V)$, the $\text{ShiftGap}$ and the score differential with $(P_S=\mathcal{U})$ over the train set. Vertical bars indicate standard error over 5 seeds.}\label{fig:numlvl_exp}
+    \caption{Investigating the effect of increasing $|L|$ when adaptive sampling induces distributional shift. Top row reports the test and train performance; the $\text{GenGap}$ is on the bottom left; on the bottom right is compared, for $(S=S^V)$, the $\text{ShiftGap}$ and the score differential with $(P_S=\mathcal{U})$ over the train set. Vertical bars indicate standard error over 5 seeds.}\label{c3:fig:numlvl_exp}
 \end{figure}
 \subsection{Distributional shift and the effect of increasing $|L|$}
-\begin{figure*}[htb]
+\begin{figure}[htb]
     \centering
     \includegraphics[width=1\linewidth]{content/Simplified_architecture_diagram_DRED.pdf}
     \caption{Overview of the data-regularised environment design framework.}
-    \label{fig:DRED-diagram}
-\end{figure*}
+    \label{c3:fig:DRED-diagram}
+\end{figure}
 %TODO: cite figure / table of aggregated procgen results
-In 3 out of 16 Procgen games, $(S=S^V)$ does not improve over $(P_S=\mathcal{U})$ on the test set, and does worse on the train set (per-game results are available in \Cref{app:procgen_extended_results}). As we are interested in combining adaptive sampling with the generation of additional levels, we conduct a preliminary experiment investigating how the inclusion of additional training levels impacts ZSG in ``Miner'', one of the games in which $(S=S^V)$ underperforms. 
+In 3 out of 16 Procgen games, $(S=S^V)$ does not improve over $(P_S=\mathcal{U})$ on the test set, and does worse on the train set (per-game results are available in \Cref{c3:app:procgen_extended_results}). As we are interested in combining adaptive sampling with the generation of additional levels, we conduct a preliminary experiment investigating how the inclusion of additional training levels impacts ZSG in ``Miner'', one of the games in which $(S=S^V)$ underperforms. 
 
-In \Cref{fig:numlvl_exp} we observe larger $L$ results in a reduction in the $\text{GenGap}$ and in an increase in test scores under uniform sampling, as reported in several prior studies \citep{OverfittingDRL,procgen,Packer2018AssessingGI}. For $(S=S^V)$ we also observe a reduction in $\text{GenGap}$ but it is caused by scores dropping over the train set instead of improving over the test set. This phenomenon is not optimisation related, as train scores for $(S=S^V)$ under its own adaptive distribution remain in-line with the $(P_S=\mathcal{U})$ train scores. In fact it is caused by distributional shift, a potential pitfall of adaptive distributions. In Miner, the shifted training distribution prevents the agent to improve its test scores further, even as the number of training levels is increased. 
+In \Cref{c3:fig:numlvl_exp} we observe larger $L$ results in a reduction in the $\text{GenGap}$ and in an increase in test scores under uniform sampling, as reported in several prior studies \citep{OverfittingDRL,procgen,Packer2018AssessingGI}. For $(S=S^V)$ we also observe a reduction in $\text{GenGap}$ but it is caused by scores dropping over the train set instead of improving over the test set. This phenomenon is not optimisation related, as train scores for $(S=S^V)$ under its own adaptive distribution remain in-line with the $(P_S=\mathcal{U})$ train scores. In fact it is caused by distributional shift, a potential pitfall of adaptive distributions. In Miner, the shifted training distribution prevents the agent to improve its test scores further, even as the number of training levels is increased. 
 
 As this phenomenon is not captured by the $\text{GenGap}$, %(training under a significantly shifted training distribution would cause the agent to perform poorly on both the train and test sets, which will result in a small $\text{GenGap}$), 
 we propose the \textit{shift-induced gap}, or $\text{ShiftGap}$, a complementary metric quantifying the performance reduction induced by distributional shift under non-uniform training distributions,
-\begin{equation} \label{eq:ShiftGap}
+\begin{equation} \label{c3:eq:ShiftGap}
     \text{ShiftGap}(\pi) \coloneqq \sum_{i \in \Lambda} P_\Lambda(i) \cdot V^\pi_{\lvl} - \frac{1}{|L|} \sum_{i \in L} V^\pi_{\lvl}.
 \end{equation}
 Unlike the $\text{GenGap}$, the $\text{ShiftGap}$ does not necessitates held-out test levels to be measured, and only relies on scores being normalised across levels.\footnote{Note that using $X_\text{test}$ in the second term makes $\text{ShiftGap}\equiv\text{GenGap}$ when $P_\Lambda = \mathcal{U}$, whereas it should be 0.} We find that the $\text{ShiftGap}$ for $(S=S^V)$ closely matches (within measurement error) the performance differential between $(S=S^V)$ and $(P_S=\mathcal{U})$ over the train set. In later experiments, we will show it is important for the $\text{ShiftGap}$ to remain small in order to achieve strong ZSG.
 %
 \begin{algorithm}[!htb]
 \centering
-\caption{Data-regularised environment design}\label{alg:DRED}
+\caption{Data-regularised environment design}\label{c3:alg:DRED}
 \begin{algorithmic}[1]
 \Input Pre-trained encoder and decoder networks $\psi_{\vtheta_E}$, $\phi_{\vtheta_D}$, level parameters $X_\text{train}$, number of pairs $M$, number of interpolations per pair $K$
 \State Initialise level buffer $\Lambda$ to level parameters in $X_\text{train}$ 
@@ -475,7 +293,7 @@ Unlike the $\text{GenGap}$, the $\text{ShiftGap}$ does not necessitates held-out
 \end{algorithm}
 %
 % \vspace{-.5em}
-\section{Data-regularised environment design}\label{sec:ssed}
+\section{Data-regularised environment design}\label{c3:sec:ssed}
 % \vspace{-.5em}
 %\section{}
 % - Introduce result on increasing |L|: cross-entropy always increases faster than entropy
@@ -487,22 +305,22 @@ We have established that we can reduce $\mut{L}{b}$ and the $\text{GenGap}$ by i
 
 Instead of direct knowledge of $p(\rvx)$, we assume having access to a limited set of level parameters $X_\text{train} \sim p(\rvx)$. Each $\vx \in X_\text{train}$ instantiates a level $i_\vx$ from the CMDP. We are allowed to sample from the full simulator parameter space $\sX$, which means we can \textit{augment} our set of training levels with new levels $\tilde{\rvx} \in \sX$.
 
-%We start by showing that, in addition to directly minimising the bound in \cref{th:gen_gap} by increasing $|L|$, adding new levels to the training set does so indirectly by also reducing $\mut (L, \pi)$.
-% \begin{proposition} \label{lem:MI_and_I}
+%We start by showing that, in addition to directly minimising the bound in \cref{c3:th:gen_gap} by increasing $|L|$, adding new levels to the training set does so indirectly by also reducing $\mut (L, \pi)$.
+% \begin{proposition} \label{c3:lem:MI_and_I}
 %     For any policy model $\pi$ and level sets $L_1$ and $L_2$ drawn from some underlying context distribution $p(\rvx)$, $L_2 \supseteq L_1 \Rightarrow \mut(L_2, \pi) \leq \mut (L_1, \pi)$.
 % \end{proposition}
-% \textit{DROPPED, add after submission: write proof and include in appendix. If we run out of time or space we can cut this part, a justification employing \Cref{th:gen_gap} only would be sufficient to motivate increasing the size of L for now.}
+% \textit{DROPPED, add after submission: write proof and include in appendix. If we run out of time or space we can cut this part, a justification employing \Cref{c3:th:gen_gap} only would be sufficient to motivate increasing the size of L for now.}
 
 %a variational autoencoder (VAE) pre-trained on $X_\text{train}$ is employed as a generative model
 
-DRED consists of two components: a \textit{generative phase}, in which an augmented set $\tilde{X}$ is generated from a batch $X \sim \mathcal{U}(X_\text{train})$ and is added to the buffer $\Lambda$, and a \textit{replay phase}, in which we use the adaptive distribution $P_\Lambda$ to sample levels from the buffer. We alternate between the generative and replay phases, and only perform gradient updates on the agent during the replay phase. \Cref{alg:DRED} and \Cref{fig:DRED-diagram} describe the full DRED pipeline, and we provide further details on each phase below.
+DRED consists of two components: a \textit{generative phase}, in which an augmented set $\tilde{X}$ is generated from a batch $X \sim \mathcal{U}(X_\text{train})$ and is added to the buffer $\Lambda$, and a \textit{replay phase}, in which we use the adaptive distribution $P_\Lambda$ to sample levels from the buffer. We alternate between the generative and replay phases, and only perform gradient updates on the agent during the replay phase. \Cref{c3:alg:DRED} and \Cref{c3:fig:DRED-diagram} describe the full DRED pipeline, and we provide further details on each phase below.
 % \vspace{-.5em}
 \subsection{The generative phase}
 % \vspace{-.5em}
 We initialise the buffer $\Lambda$ to contain $X_\text{train}$ levels and gradually add generated levels $\tilde{X}$ over the course of training. DRED is not restricted to a particular approach to obtain $\tilde{X}$. In this work, we use a VAE \citep{VAE, VAE-pmlr-v32-rezende14} and refer to our method as VAE-DRED. The VAE models the underlying training data distribution $p(\rvx)$ % = \frac{1}{|\mathcal{D}|}\sum_{\tilde \rvx \in \mathcal{D}} \delta_{\tilde \rvx}(\rvx)$ 
 as stochastic realisations of a latent distribution $p(\rvz)$ via a generative model $p(\rvx \mid \rvz)$.
 The model is pre-trained on $X_\text{train}$ by maximising the variational ELBO
-\begin{equation} \label{eq:ELBO}
+\begin{equation} \label{c3:eq:ELBO}
 \begin{split}
     \mathcal{L}_{\text{ELBO}} = & \mathop{\mathbb{E}}_{\vx\sim p(\rvx)} [  \mathop{\mathbb{E}}_{\vz \sim q(\rvz|\rvx; \psi_{\vtheta_E})}[\log p(\rvx \mid \rvz; \phi_{\vtheta_D})] \\
     & - \beta \KL(q(\rvz \mid \rvx;\psi_{\vtheta_E})\mid\mid p(\rvz))],
@@ -511,18 +329,18 @@ The model is pre-trained on $X_\text{train}$ by maximising the variational ELBO
 where $q(\rvz \mid \rvx; \psi_{\vtheta_E})$ is a variational approximation of an intractable model posterior distribution $p(\rvz \mid \rvx)$ and $\KL(\cdot \mid\mid \cdot)$ denotes the Kullback--Leibler divergence, which is balanced using the coefficient $\beta$, as proposed by \citet{betaVAE}. 
 The generative $p(\rvx \mid \rvz; \phi_{\vtheta_D})$ and variational $q(\rvz \mid \rvx ; \psi_{\vtheta_E})$ models are parametrised via encoder and decoder networks $\psi_{\vtheta_E}$ and $\phi_{\vtheta_D}$.%encoder $\psi(\vx; \vtheta_E)$ and decoder $\phi(\vz; \vtheta_D)$ 
 
-Maximising \Cref{eq:ELBO} fits the VAE such that $p(\rvx; \phi_{\vtheta_D}) = \int p(\rvx \mid \rvz; \phi_{\vtheta_D}) p(\rvz) \dif \rvz \approx p(\rvx)$. Out-of-context levels are less likely with $\tilde{\vx} \sim p(\rvx; \phi_{\vtheta_D})$ than with $\tilde{\vx} \sim \mathcal{U}(\sX)$, and we show in \Cref{sec:minigrid} that this aspect is key in enabling DRED agents to outperform UED agents. %Our experiments in \Cref{sec:minigrid} demonstrate minimal distributional shift being a crucial aspect in DRED improving the generalisation capabilities of the agent against generative methods sampling directly from $\sX$. 
-We follow \citet{white2016sampling} and interpolate $\rvz$ in the latent space between the latent representations of a pair of samples $(\vx_i, \vx_j) \sim X_\text{train}$ (instead of sampling $\rvz$ from $p(\rvz)$), as this improves the quality of the generated $\tilde{\vx}$.
+Maximising \Cref{c3:eq:ELBO} fits the VAE such that $p(\rvx; \phi_{\vtheta_D}) = \int p(\rvx \mid \rvz; \phi_{\vtheta_D}) p(\rvz) \dif \rvz \approx p(\rvx)$. Out-of-context levels are less likely with $\tilde{\vx} \sim p(\rvx; \phi_{\vtheta_D})$ than with $\tilde{\vx} \sim \mathcal{U}(\sX)$, and we show in \Cref{c3:sec:minigrid} that this aspect is key in enabling DRED agents to outperform UED agents. %Our experiments in \Cref{c3:sec:minigrid} demonstrate minimal distributional shift being a crucial aspect in DRED improving the generalisation capabilities of the agent against generative methods sampling directly from $\sX$. 
+We follow \citet{smileVAE} and interpolate $\rvz$ in the latent space between the latent representations of a pair of samples $(\vx_i, \vx_j) \sim X_\text{train}$ (instead of sampling $\rvz$ from $p(\rvz)$), as this improves the quality of the generated $\tilde{\vx}$.
 
-After generating a batch of levels parameters $\tilde{X}$ we collect rollouts (without updating agent weights) to compute their scores, adding to the buffer $\Lambda$ any level scoring higher than the lowest scoring generated level in $\Lambda$. We only consider levels solved at least once during rollouts for inclusion, to ensure that unsolvable levels do not get added in. We provide additional details on the VAE architecture, hyperparameters and pre-training process in \Cref{app:vae_imp}.
+After generating a batch of levels parameters $\tilde{X}$ we collect rollouts (without updating agent weights) to compute their scores, adding to the buffer $\Lambda$ any level scoring higher than the lowest scoring generated level in $\Lambda$. We only consider levels solved at least once during rollouts for inclusion, to ensure that unsolvable levels do not get added in. We provide additional details on the VAE architecture, hyperparameters and pre-training process in \Cref{c3:app:vae_imp}.
 
 %DROPPED: missing the relationship between ELBO LOSS and MI, not sure how/where to weave it in yet.
 % \vspace{-.5em}
 \subsection{The replay phase}
 % \vspace{-.5em}
-All levels in $X_\text{train}$ originate from $p(\rvx)$ and are in-context, whereas generated levels, which are obtained from an approximation of $p(\rvx)$, do not benefit from as strong of a guarantee. As training on out-of-context levels can significantly harm the agents' performance on the CMDP, we control the ratio between $X_\text{train}$ and augmented levels using the mixed scoring introduced in \Cref{eq:buffer_dist} for $P_\Lambda$. The support of $P_S$ and $P_R$ is limited to $X_\text{train}$, whereas $P_{S^\prime}$ supports the entire buffer. We set both $S$ and $S^\prime$ to score levels according to the $\ell_1$-value loss. We find out-of-context levels to be particularly harmful in the early stages of training, and limit their occurrence early on by linearly increasing $\eta$ from 0 to 1 over the course of training.
+All levels in $X_\text{train}$ originate from $p(\rvx)$ and are in-context, whereas generated levels, which are obtained from an approximation of $p(\rvx)$, do not benefit from as strong of a guarantee. As training on out-of-context levels can significantly harm the agents' performance on the CMDP, we control the ratio between $X_\text{train}$ and augmented levels using the mixed scoring introduced in \Cref{c3:eq:buffer_dist} for $P_\Lambda$. The support of $P_S$ and $P_R$ is limited to $X_\text{train}$, whereas $P_{S^\prime}$ supports the entire buffer. We set both $S$ and $S^\prime$ to score levels according to the $\ell_1$-value loss. We find out-of-context levels to be particularly harmful in the early stages of training, and limit their occurrence early on by linearly increasing $\eta$ from 0 to 1 over the course of training.
 % \vspace{-.5em}
-\section{DRED experiments}\label{sec:minigrid}
+\section{DRED experiments}\label{c3:sec:minigrid}
 % \vspace{-.5em}
 % - Show MI reduction compared to PLR-D, Uniform-D
 % - Show reduced dist shift compared to DR, ACCEL, RPLR
@@ -534,17 +352,17 @@ Our experiments seek to answer the following questions: 1)~How important is it t
  We choose Minigrid \citep{gym_minigrid}, a partially observable gridworld navigation domain, for our experiments. Despite its simplicity, Minigrid has a controllable level parameter space (unlike Procgen), and levels are parameterised to vectors describing the locations, starting states and appearance of the objects in the grid. 
  
 When benchmarking UED methods (and RL algorithms in general) it is implicitly agreed upon that each (solvable) level instantiated belongs to the target CMDP. Yet, this is rarely true in a practical application, as in-context level parameters $\sX_C$ often correspond to a small and highly structured region of the simulator parameter space $\sX$. With this is mind, we seek to design a target CMDP with similar properties in Minigrid. We define the context space of our target CMDP as spanning the layouts where the location of green ``moss'' tiles and orange ``lava'' tiles are respectively positively and negatively correlated to their distance to the goal location. 
-We employ procedural generation to obtain a set $X_\text{train}$ of 512 level parameters (we refer the reader to \Cref{fig:layouts_dataset} for a visualisation of levels from $X_\text{train}$, and to \Cref{app:cmdp_levelset} for extended details on the CMDP specification and procedural generation processes).
+We employ procedural generation to obtain a set $X_\text{train}$ of 512 level parameters (we refer the reader to \Cref{c3:fig:layouts_dataset} for a visualisation of levels from $X_\text{train}$, and to \Cref{c3:app:cmdp_levelset} for extended details on the CMDP specification and procedural generation processes).
 
 As the agent only observes its immediate surroundings and does not know the goal location a priori, the optimal CMDP policy is one that exploits the semantics shared by all levels in the CMDP, exploring first areas with high perceived moss density and avoiding areas with high lava density. Other CMDPs exist in the level space, and may correspond to incompatible optimal policies (for example a CMDP in which the correlation of moss and lava tiles with the goal is reversed). As such, it is important to maintain consistency with the CMDP semantics when generating new levels.
 
-Our first set of baselines is restricted to sample from $X_\text{train}$, and consists of uniform sampling ($\mathcal{U}$) and sampling using the $\ell_1$-value loss strategy (PLR). Our second set uses level generation, removing this restriction. We consider domain randomisation (DR) \citep{DR} which generates levels by sampling uniformly between pre-determined ranges of parameters; RPLR \citep{Robust-PLR}, which combines PLR with DR used as its generator; and the current UED state-of-the-art, ACCEL \citep{ACCEL}, an extension of RPLR replacing DR by a generator making local edits to currently high scoring levels in the buffer. %SPACE could move below sentence to appendix
-In all experiments we train the same PPO \citep{PPO} agent for 27k updates. Additional details on our implementation are provided in \Cref{app:impl_minigrid}.
+Our first set of baselines is restricted to sample from $X_\text{train}$, and consists of uniform sampling ($\mathcal{U}$) and sampling using the $\ell_1$-value loss strategy (PLR). Our second set uses level generation, removing this restriction. We consider domain randomisation (DR) \citep{tobin2017domain} which generates levels by sampling uniformly between pre-determined ranges of parameters; RPLR \citep{Robust-PLR}, which combines PLR with DR used as its generator; and the current UED state-of-the-art, ACCEL \citep{ACCEL}, an extension of RPLR replacing DR by a generator making local edits to currently high scoring levels in the buffer. %SPACE could move below sentence to appendix
+In all experiments we train the same PPO \citep{PPO} agent for 27k updates. Additional details on our implementation are provided in \Cref{c3:app:impl_minigrid}.
 %To perform an ablation study on the importance of DRED's learned generative model, we introduce EL-DRED, where we replace DRED's generative model with ACCEL's level editing strategy. 
 %We expect the first set of baselines to exhibit large mutual information with $X_\text{train}$, leading to overfitting, while the second set should induce a shift in the training distribution, leading to over-generalisation. In constrast, we expect ICED to exhibit low mutual-information and shift, and as such be robust to both of these generalisation failure modes. 
 % \vspace{-.5em}
 \subsection{Results}
-\begin{figure*}[tb]
+\begin{figure}[tb]
 \centering
 % \begin{subfigure}[]{0.9\linewidth}
     \begin{subfigure}[]{.08\linewidth}
@@ -574,21 +392,21 @@ In all experiments we train the same PPO \citep{PPO} agent for 27k updates. Addi
     \includegraphics[width=1\linewidth]{content/solved_rates/solved_rate_EdgeCall.pdf}
     \end{subfigure}%
 % \end{subfigure}
-\caption{Aggregate final performance and mean solved rate on $X_\text{test}$, an evaluation set of 2048 levels sampled from $p(\rvx)$ and held-out during training (top), and on 448 in-context edge cases (bottom). Example layouts from each evaluation set are plotted on the left. The coloured boxes indicate a 99\% confidence interval and the black horizontal bars indicate standard error across 5 training seeds. We refer the reader to \Cref{app:cmdp_levelset} for additional details on our evaluation sets.}
-\label{fig:zsg_test_set_and_edge_cases}
+\caption{Aggregate final performance and mean solved rate on $X_\text{test}$, an evaluation set of 2048 levels sampled from $p(\rvx)$ and held-out during training (top), and on 448 in-context edge cases (bottom). Example layouts from each evaluation set are plotted on the left. The coloured boxes indicate a 99\% confidence interval and the black horizontal bars indicate standard error across 5 training seeds. We refer the reader to \Cref{c3:app:cmdp_levelset} for additional details on our evaluation sets.}
+\label{c3:fig:zsg_test_set_and_edge_cases}
 % \vspace{-1.5em}
-\end{figure*}
+\end{figure}
 % \vspace{-.5em}
 % Performance on test set and edge cases
-\textbf{ZSG to held-out levels.} As shown in \Cref{fig:zsg_test_set_and_edge_cases} (top), VAE-DRED achieves statistically significant improvements in its IQM (inter-quantile mean), mean score, optimality gap (compared to the level-specific optimal policy) and mean solved rate over other methods on held-out levels from the CMDP. VAE-DRED drastically increases the number of training levels available to the agent while remaining consistent with the target CMDP. VAE-DRED maintains a small distributional shift, which we quantify in our extended analysis in \Cref{app:dist-shift}, and a low $\text{ShiftGap}$ throughout training (\Cref{fig:gen_gaps}). This is thanks to its generative model effectively approximating $p(\rvx)$, and to its mixed sampling strategy ensuring levels from $X_\text{train}$ are sampled often, and even more-so early-on. Despite small $\text{GenGap}$ (\Cref{fig:gen_gaps}), UED baselines achieve low test scores, as they perform poorly on both the test set and on $X_\text{train}$.  Further analysis conducted in \Cref{app:dist-shift} confirms that, in general, UED methods incur larger distributional shift than DRED or adaptive sampling strategies, and result in larger $\text{ShiftGap}$.
+\textbf{ZSG to held-out levels.} As shown in \Cref{c3:fig:zsg_test_set_and_edge_cases} (top), VAE-DRED achieves statistically significant improvements in its IQM (inter-quantile mean), mean score, optimality gap (compared to the level-specific optimal policy) and mean solved rate over other methods on held-out levels from the CMDP. VAE-DRED drastically increases the number of training levels available to the agent while remaining consistent with the target CMDP. VAE-DRED maintains a small distributional shift, which we quantify in our extended analysis in \Cref{c3:app:dist-shift}, and a low $\text{ShiftGap}$ throughout training (\Cref{c3:fig:gen_gaps}). This is thanks to its generative model effectively approximating $p(\rvx)$, and to its mixed sampling strategy ensuring levels from $X_\text{train}$ are sampled often, and even more-so early-on. Despite small $\text{GenGap}$ (\Cref{c3:fig:gen_gaps}), UED baselines achieve low test scores, as they perform poorly on both the test set and on $X_\text{train}$.  Further analysis conducted in \Cref{c3:app:dist-shift} confirms that, in general, UED methods incur larger distributional shift than DRED or adaptive sampling strategies, and result in larger $\text{ShiftGap}$.
 
-\textbf{ZSG to edge cases.} We next investigate whether VAE-DRED's level generation improves robustness to in-context \textit{edge cases} with a near zero likelihood of occurring in $X_\text{train}$ (\Cref{fig:zsg_test_set_and_edge_cases}, bottom). We find VAE-DRED to be particularly dominant in this setting, achieving over three times DR's IQM, the next best method, and twice its solved rate and mean score. VAE-DRED makes the agent robust to edge cases by introducing additional diversity in the training levels. These generated levels remain consistent with the CMDP semantics, as can be observed qualitatively in renderings of generated levels in \Cref{fig:interpolated_levels} and quantitatively in the training distribution metrics reported in in \Cref{fig:buffermetrics}.
+\textbf{ZSG to edge cases.} We next investigate whether VAE-DRED's level generation improves robustness to in-context \textit{edge cases} with a near zero likelihood of occurring in $X_\text{train}$ (\Cref{c3:fig:zsg_test_set_and_edge_cases}, bottom). We find VAE-DRED to be particularly dominant in this setting, achieving over three times DR's IQM, the next best method, and twice its solved rate and mean score. VAE-DRED makes the agent robust to edge cases by introducing additional diversity in the training levels. These generated levels remain consistent with the CMDP semantics, as can be observed qualitatively in renderings of generated levels in \Cref{c3:fig:interpolated_levels} and quantitatively in the training distribution metrics reported in in \Cref{c3:fig:buffermetrics}.
 
 %TODO: check perf ratio
-\textbf{ZSG to hard levels.} In \Cref{fig:zsg_hard,fig:zsg_hard_set_and_edge_cases}, we evaluate transfer to in-context ``Hardcore'' levels. Being 9 times larger in area than training levels, Hardcore levels are significantly more
+\textbf{ZSG to hard levels.} In \Cref{c3:fig:zsg_hard,c3:fig:zsg_hard_set_and_edge_cases}, we evaluate transfer to in-context ``Hardcore'' levels. Being 9 times larger in area than training levels, Hardcore levels are significantly more
 challenging to solve, even for Humans. This setting is where the performance gap between VAE-DRED and other methods is the largest, with VAE-DRED solving three times as many levels as the next best baseline.
 
-\textbf{Ablations.} To better understand the importance of the pre-trained generative model, we introduce EL-DRED, which replaces the VAE with ACCEL's local edit strategy. EL-DRED may be viewed as a DRED variant of ACCEL augmenting $X_\text{train}$ using a non-parametric generative method, or, equivalently, as an ablation of VAE-DRED that does not approximate $p(\rvx)$, and is therefore less grounded to the CMDP. EL-DRED outperforms all other methods in each of the level sets depicted above, with the exception of VAE-DRED. In \Cref{fig:zsg_hard} (bottom right), we compare the two methods, and find that VAE-DRED remains significantly more likely to outperform EL-DRED in each level set. Finally, ACCEL-D shows that initialising the buffer to $X_\text{train}$ isn't sufficient for preventing ACCEL's editing mechanism to rapidly incur significant distributional shift. The only difference between EL-DRED and ACCEL-D is $\eta$ being set to 1 throughout training (see the text box in \Cref{fig:DRED-diagram} for a depiction of the role of $\eta$ in DRED). Yet, the gap in performance is significant, and highlights the importance of avoiding out-of-context levels early in training.%We refer the reader to \Cref{app:minigrid_extended_results} for extended results.%\footnote{The text box in \Cref{fig:DRED-diagram} gives a refresher on the role of $\eta$ in DRED.} Yet, the gap in performance is significant, and highlights the importance of avoiding out-of-context levels early in training.%We refer the reader to \Cref{app:minigrid_extended_results} for extended results.
+\textbf{Ablations.} To better understand the importance of the pre-trained generative model, we introduce EL-DRED, which replaces the VAE with ACCEL's local edit strategy. EL-DRED may be viewed as a DRED variant of ACCEL augmenting $X_\text{train}$ using a non-parametric generative method, or, equivalently, as an ablation of VAE-DRED that does not approximate $p(\rvx)$, and is therefore less grounded to the CMDP. EL-DRED outperforms all other methods in each of the level sets depicted above, with the exception of VAE-DRED. In \Cref{c3:fig:zsg_hard} (bottom right), we compare the two methods, and find that VAE-DRED remains significantly more likely to outperform EL-DRED in each level set. Finally, ACCEL-D shows that initialising the buffer to $X_\text{train}$ isn't sufficient for preventing ACCEL's editing mechanism to rapidly incur significant distributional shift. The only difference between EL-DRED and ACCEL-D is $\eta$ being set to 1 throughout training (see the text box in \Cref{c3:fig:DRED-diagram} for a depiction of the role of $\eta$ in DRED). Yet, the gap in performance is significant, and highlights the importance of avoiding out-of-context levels early in training.%We refer the reader to \Cref{c3:app:minigrid_extended_results} for extended results.%\footnote{The text box in \Cref{c3:fig:DRED-diagram} gives a refresher on the role of $\eta$ in DRED.} Yet, the gap in performance is significant, and highlights the importance of avoiding out-of-context levels early in training.%We refer the reader to \Cref{c3:app:minigrid_extended_results} for extended results.
 %
 \begin{figure}[htb]
 \centering
@@ -609,13 +427,13 @@ challenging to solve, even for Humans. This setting is where the performance gap
     \end{subfigure}%
 \caption{Top right: Solved rate achieved on 216 ``Hardcore'' levels (examples plotted on the left). Bottom right: Probability of VAE-DRED achieving higher zero-shot returns than its ablation EL-DRED, on different evaluation sets. Coloured boxes indicate the 99\% confidence interval. %TODO: confidence interval, number of levels in other figures.
 }
-\label{fig:zsg_hard}
+\label{c3:fig:zsg_hard}
 % \vspace{-1.5em}
 \end{figure}
 %
 % It would be good to make a quick mention of sample efficiency being important? or in related work
 % \vspace{-.5em}
-\section{Related work}\label{sec:rw}
+\section{Related work}\label{c3:sec:rw}
 % \vspace{-.5em}
 %Could also place at the end or even before preliminaries?
 % - make link to techniques minimising mutual info through the agent model or through augmentation of observations
@@ -623,7 +441,7 @@ challenging to solve, even for Humans. This setting is where the performance gap
 % - PAIRED and CLUTR for learnt editor, but highlight poor performance over a random generator. SAMPLR for investigating covariate shift but mention how they investigate setting in which the target and train distribution share the same support
 % - [...]
 % - check references in https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_classif.html#r50b872b699c4-4 
-\textbf{Buffer-free sampling strategies.} Domain randomisation \citep[DR,][]{DR, DR1997}, is one of the earliest proposed methods for improving the generalisation ability of RL agents by augmenting the set of available training levels. It does so by sampling uniformly between manually specified ranges of environment parameters. Subsequent contributions introduce an implicit prioritisation over the generated set by inducing a minimax return \citep[robust adversarial RL,][]{Pinto2017RobustAdversarialRL} or a minimax regret game \citep[UED,][]{PAIRED} between the agent and a \textit{level generator}, which are trained concurrently. These adversarial formulations prioritise levels in which the agent is currently performing poorly to encourage robust generalisation over the sampled set, with UED achieving better Nash equilibrium theoretical guarantees. CLUTR \citep{CLUTR} removes the need for domain-specific RL environments and improves sample efficiency by having the level generator operate within a low dimensional latent space of a generative model pre-trained on randomly sampled level parameters. However, buffer-free methods remain vastly outperformed by a well calibrated DR implementation and the buffer-based sampling strategies discussed next.
+\textbf{Buffer-free sampling strategies.} Domain randomisation \citep[DR,][]{tobin2017domain, DR1997}, is one of the earliest proposed methods for improving the generalisation ability of RL agents by augmenting the set of available training levels. It does so by sampling uniformly between manually specified ranges of environment parameters. Subsequent contributions introduce an implicit prioritisation over the generated set by inducing a minimax return \citep[robust adversarial RL,][]{Pinto2017RobustAdversarialRL} or a minimax regret game \citep[UED,][]{PAIRED} between the agent and a \textit{level generator}, which are trained concurrently. These adversarial formulations prioritise levels in which the agent is currently performing poorly to encourage robust generalisation over the sampled set, with UED achieving better Nash equilibrium theoretical guarantees. CLUTR \citep{CLUTR} removes the need for domain-specific RL environments and improves sample efficiency by having the level generator operate within a low dimensional latent space of a generative model pre-trained on randomly sampled level parameters. However, buffer-free methods remain vastly outperformed by a well calibrated DR implementation and the buffer-based sampling strategies discussed next.
 
 \textbf{Buffer-based sampling strategies.} Prioritised sampling is often applied to off-policy algorithms, where individual interactions within the replay buffer are prioritised \citep{Schaul2015PrioritizedER} or resampled with different goals in multi-goal RL \citep{HER,zhang2020automatic}. Prioritised Level Replay \citep[PLR,][]{PLR} instead affects the sampling process of \textit{future} experiences, and is thus applicable to both on- and off-policy algorithms. PLR maintains a buffer of training levels and empirically demonstrates that prioritising levels using a scoring function proportional to high value prediction loss results in higher sample efficiency and improved ZSG performance. Robust PLR \citep[RPLR,][]{Robust-PLR} extends PLR to the UED setting, using DR as its level generation mechanism, while ACCEL \citep{ACCEL} gradually evolves new levels by performing random edits on high scoring levels in the buffer. SAMPLR \citep{SAMPLR} proposes to  eliminate the distributional shift induced by the prioritisation strategy by modifying individual interactions using a second simulator that runs in parallel. However, SAMPLR only applies to settings with direct access to the ground truth context distribution, while DRED learns to approximate this distribution.
 
@@ -632,10 +450,10 @@ challenging to solve, even for Humans. This setting is where the performance gap
 %DROPPED: consider if we want to be more explicit in challenging the minimax regret framework 
 % Lastly, RPLR, ACCEL and SAMPLR prioritise levels using the Positive Value Loss (PVL), which is presented as a surrogate signal for the regret by only considering the positive terms of the $\ell_1$-value loss ($V^\pi_t - \hat{V}^\pi_t > 0$). 
 
-\textbf{Mutual information minimisation in RL.} In prior work, mutual information has been minimised in order to mitigate instance-overfitting, either by learning an ensemble of policies \citep{instance_invariant,E-POMDP}, performing data augmentation on observations \citep{raileanu2021UCB-DrAC,Kostrikov2021ImageAllYouNeed}, an auxiliary objective \citep{mhairiCMID,dunion2024mvd} or introducing information bottlenecks through selective noise injection on the agent model \citep{vib_actor_critic,coinrun}. In contrast, our work is the first to draw connections between mutual information minimisation and adaptive level sampling.
+\textbf{Mutual information minimisation in RL.} In prior work, mutual information has been minimised in order to mitigate instance-overfitting, either by learning an ensemble of policies \citep{instance_invariant,E-POMDP}, performing data augmentation on observations \citep{raileanu2021UCB-DrAC,yarats2021image}, an auxiliary objective \citep{mhairiCMID,dunion2024mvd} or introducing information bottlenecks through selective noise injection on the agent model \citep{vib_actor_critic,coinrun}. In contrast, our work is the first to draw connections between mutual information minimisation and adaptive level sampling.
 %
 % \vspace{-.5em}
-\section{Conclusion}\label{sec:disc}
+\section{Conclusion}\label{c3:sec:disc}
 % \vspace{-.5em}
 In this work, we investigated the impact of the level sampling process on the ZSG capabilities of RL agents. We found adaptive sampling strategies are best understood as data regularisation techniques minimising the mutual information between the agent's internal representation and the identity of training levels. In doing so, these methods minimise an upper bound on the generalisation gap, and our experiments show that this bound acts as an effective proxy for reducing this gap in practice. This theoretical framing allowed us to understand the mechanism behind the improved generalisation achieved by value loss prioritised level sampling, which had only been justified empirically in prior work. We introduced DRED, a framework combining adaptive sampling with the generation of new levels using a learned model of the context distribution. We propose VAE-DRED, an application of DRED using a VAE to learn the context distribution. Our experiments show that VAE-DRED prevents the significant distributional shift observed in other UED methods. By jointly achieving low $\text{GenGap}$ and $\text{ShiftGap}$, VAE-DRED achieves strong generalisation performance on in-distribution test levels, while also being robust to in-context edge cases.
 
@@ -646,20 +464,12 @@ This paper presents work whose goal is to advance the field of Machine Learning.
 
 We believe parametrisable simulators are better suited to benchmark RL algorithms than procedural environments, as they provide a fine degree of control over the environment and are more consistent with a realistic application setting, as argued by \citet{kirk2023survey}. However, reproducibility can be challenging without access to the data generated during experiments. To assist with this, we make all of our experimental data, including model checkpoints, level datasets, logged data and the code for reproducing the figures in this paper openly available.
 
-We open-source our code for specifying arbitrary CMDPs in Minigrid and generate their associated level sets (we describe the generation process in detail in \Cref{app:cmdp_levelset}). We also provide a dataset of 1.5M procedurally generated minigrid base layouts to facilitate level set generation.%\footnotemark[\value{footnote}]
+We open-source our code for specifying arbitrary CMDPs in Minigrid and generate their associated level sets (we describe the generation process in detail in \Cref{c3:app:cmdp_levelset}). We also provide a dataset of 1.5M procedurally generated minigrid base layouts to facilitate level set generation.%\footnotemark[\value{footnote}]
 
-\section*{Acknowledgements}
-This work was supported by the United Kingdom Research and Innovation EPSRC Centre for Doctoral Training in Robotics and Autonomous Systems (RAS) in Edinburgh.
-
-%TODO: cleanup refs, links are not respecting the linewidth
-\bibliography{basebibfile}
-\bibliographystyle{icml2024}
-
-\newpage
-\onecolumn
-\appendix
-
-\input{supplementary}
-
-
-\end{document}
+%% --- Appendix: rendered as per-chapter lettered sections (A, B, ...) ---
+\clearpage
+\begin{subappendices}
+\crefalias{section}{appendix}
+\crefalias{subsection}{appendix}
+\input{chapter3_dred/paper/supplementary}
+\end{subappendices}

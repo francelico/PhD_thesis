@@ -50,23 +50,7 @@
 \newcommand{\sndif}[2]{\frac{\mathrm{d} \,^{2} #1}{\mathrm{d} #2^{2}}}
 %% ordinary second differential.
 
-%%%%% Thesis-by-publication: embed a paper's standalone PDF.
-%% \includepaper{path/to/paper.pdf}{Paper Title} drops every page of a
-%% separately-compiled publication into the thesis. The pages render exactly as
-%% the standalone paper; the thesis stamps a continuous (global) page number via
-%% the 'plain' page style.
-%% The papers are US Letter and the thesis is A4, so 'scale' shrinks each page
-%% uniformly to fit A4 (tune here in ONE place if the fit needs adjusting).
-%% addtotoc adds a section-level table-of-contents entry and PDF bookmark for the
-%% paper, pointing at its first page and labelled with its title. It writes only
-%% to the .toc/bookmarks -- nothing is printed on the page itself.
-%% Requires the pdfpages package (loaded in packages.tex).
-\newcounter{embeddedpaper}
-\newcommand{\includepaper}[2]{%
-  \stepcounter{embeddedpaper}%
-  \includepdf[pages=-,
-              scale=0.92,
-              pagecommand={\thispagestyle{plain}},
-              offset=0 0,
-              addtotoc={1,section,1,{#2},paper:\theembeddedpaper}]{#1}%
-}
+%%%%% Thesis-by-publication: the three research chapters now embed each paper as
+%% NATIVE thesis source (see papers_support.tex and each chapterN_*/paper/
+%% main_text.tex). The previous approach -- embedding a standalone-compiled paper
+%% PDF page-by-page via \includepaper/pdfpages -- has been retired.
