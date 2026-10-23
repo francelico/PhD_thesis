@@ -292,7 +292,7 @@ We conduct our experiments within Luanti~\citep{luanti2024}, an open-source voxe
 
 
 \textbf{Dataset.} We use the Craftium platform~\citep{malagon2025craftium} to collect game data to train and evaluate our models. We collect $\sim$40M environment interactions consisting of player actions, camera states, pixel and 3D observations. Actions are represented as multi-hot vectors encoding individual key presses and discretised mouse movements. 3D observations are represented as a $48^3$ voxel grid centred on the agent. In Luanti, individual voxels contain semantic information about a specific spatial location, encoded as integer labels. In total, we collect $\sim$100K trajectories, amounting to 460 hours of gameplay recorded at 24Hz. 
-To interact with the game, we employ a similar strategy as~\citep{yu2025gamefactory} and design a simple policy that randomly samples from a set of pre-defined action sequences. %\Cref{c4:app:data} provides further details on our data collection strategy.
+Training data are collected exclusively using a Free Play policy that randomly samples from predefined action sequences, following \citet{yu2025gamefactory}. Evaluation uses held-out world-generation seeds; the human study additionally includes the Move Forward, Move Backward, and Orbit policies (\Cref{c4:app:data_met}). %\Cref{c4:app:data} provides further details on our data collection strategy.
 
 \textbf{Training and Inference.} All models are trained using the AdamW~\citep{loshchilov2018decoupled} optimizer with a learning rate of $1e-4$. We first train the VAEs and pre-encode the 3D and pixel latents to accelerate the training of the dynamic models. The pixel and 3D VAEs take 4 and 12 days to train using 8 A100 GPUs. We train two versions of the 3D denoiser, ``3D-S'' and ``3D-XL'', which uses 8$\times$ more spatial tokens. 3D-S takes 3 days to train on 8 H100 GPUs, while 3D-XL and the pixel denoiser each take 10 days. The camera model trains on a single A100 in 16 hours with batch size 256. All other models use batch size 64. Each model is trained separately and assembled in the full pipeline with no further fine-tuning. At inference, we use 20 denoising steps per-frame and slightly noise past context frames to make the denoisers more resilient to imperfections in their own generations. We provide more implementation details in \Cref{c4:app:implt}.
 
@@ -404,6 +404,15 @@ Finally, we note that Oasis effectively serves as a baseline ablation of the ent
 
 \textbf{Quantitative Results.} As shown in \Cref{c4:tab:fvd}, baselines relying solely on pixel history (Oasis and WorldMem) yield significantly worse FVD scores, with generation quality degrading sharply over time. In contrast, PERSIST and its variants maintain stable FVD scores across extended horizons, highlighting the critical role of conditioning on the 3D state. Among the ablations, No-3D-Upscale suffers the highest FVD penalty. This confirms the benefit of rendering from a high-resolution 3D latent, which produces a $\vw_{2D}$ with superior depth resolution and 3D-to-pixel alignment. Conversely, PERSIST-S performs only marginally worse than the base configuration. While upscaling is crucial for rendering, the underlying 3D representation is highly robust to spatial compression (up to $512\times$ when combining the 3D-VAE and 3D-S denoiser). Finally, while Camera-GT achieves an FVD nearly identical to the base model, we observe that bypassing the learned camera model introduces physical inconsistencies that are not captured by the FVD (e.g. agent phasing through terrain or floating). We provide a qualitative example in \Cref{c4:fig:camera_clip}.
 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{figs/camera_clip.jpg}
+    \caption{Conditioning on the
+ground truth camera trajectory results in physical inconsistency with the world-frame, causing the agent to phase
+through a wall.}
+    \label{c4:fig:camera_clip}
+\end{figure}
+
 \textbf{Generation stability.} Qualitative analysis of sample rollouts (\Cref{c4:fig:rollout}) confirms that pixel-history baselines consistently produce irrecoverable artifacts by the 200\textsuperscript{th} timestep. In contrast, PERSIST produces remarkably stable rollouts. We corroborate this observation by measuring FID~\citep{heusel2017gans} at each generation timestep (\Cref{c4:fig:fid_vs_t}), finding that PERSIST suffers virtually no degradation over a 600-step episode. PERSIST does begin the episode with a slightly higher FID because it regenerates the initial pixel observation to ensure proper pixel/world-frame alignment. To demonstrate that this initial penalty is strictly an alignment artifact, \Cref{c4:fig:fid_vs_t} includes PERSIST$+\vw_0$, a variant introduced in \Cref{c4:sec:new_app} that receives perfectly aligned initial world and pixel frames. Regardless of initialization, PERSIST maintains its visual quality over time, whereas pixel-history baselines rapidly degrade.
 
 In practice, we observe that the world-frames produced by $\gW_\theta$ remain coherent for several thousand steps. Because $\vw_{2D}$ is obtained directly from these highly stable world-frames, it provides reliable structural guidance over long horizons and lets $\gP_\theta$ recover from visual artifacts. We showcase multiple examples of this self-correction over the course of a 2,000-step episode in \Cref{c4:fig:limitations}.
@@ -441,6 +450,14 @@ In addition to its improvement to the quality and coherence of generated experie
 
 \textbf{3D generation.} At initialisation, it is essential for $\vw_0$ to capture the structure and semantics of the provided conditioning RGB observation. In \Cref{c4:fig:w0_gen}, we show that $\gW_\theta$ successfully generates plausible starting world frames, while also outpainting unseen regions differently from one episode to the next. This ability lets PERSIST generate environments that are both diverse and coherent, supporting a wide variety of interactive experiences.
 
+\begin{figure}[!htb]
+  \begin{center}
+    \centerline{\includegraphics[width=0.75\linewidth]{figs/w0_generations.png}}
+    \caption{PERSIST generates diverse but coherent initial world frames from a single RGB conditioning observation. Each row corresponds to a specific input RGB frame, while each column depicts the initial world frame sampled from $\gW_\theta$ during a specific generation episode.}
+    \label{c4:fig:w0_gen}
+  \end{center}
+\end{figure}
+
 %Todo: example
 \textbf{Explicit 3D initialisation.} By default, PERSIST initialises generation from starting condition $\langle \vo_0, \vc_0\rangle$, with the initial world-frame $\vw_0$ being inferred by the world dynamics model $\gW_\theta$. However, PERSIST also supports $\vw_0$ being provided as a starting condition\footnote{See \Cref{c4:alg:PERSIST,c4:alg:PERSIST-w0} for the respective inference algorithms of PERSIST and PERSIST+$\vw_0$.}. This explicit 3D conditioning allows a greater degree of control over the generated experience than providing an image, as the full surroundings of the agent can be specified.
 
@@ -453,11 +470,136 @@ To assess how effectively PERSIST can leverage explicit 3D conditioning, we eval
 
 %PERSIST continuously models dynamic processes in the environment, even while they are not being actively rendered to screen space. In \Cref{c4:dynamic}, we observe a waterfall gradually flooding the area, causing some water to eventually appear in the player's view.
 \vspace{-0.25cm}
+\section{Limitations and Future Work}\label{c4:sec:limitations}
+
+The limitations below delimit PERSIST's contribution to the simulation bottleneck. In particular, the current training procedure still requires ground-truth 3D annotations, provided here by the simulated environment.
+
+\textbf{Training without ground truth 3D supervision.} Our results underscore the critical role of explicit 3D representations in maintaining environmental coherence over long horizons. Currently, however, PERSIST acquires this representation via supervised training, restricting its applicability to simulators or datasets providing 3D annotations~\citep[e.g.][]{zhou2018stereo,Matterport3D,yeshwanth2023scannet++}. A key direction for future work is to relax this dependency by learning 3D representations directly from pixels, or by leveraging recent advances in 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages} to generate synthetic 3D annotations as a pre-processing step.
+
+\textbf{Eliminating exposure bias.} While PERSIST yields substantial improvements in generation quality, temporal stability, and environmental coherence over baselines, human evaluators tend to prefer ground-truth videos in head-to-head comparisons, reporting a gradual degradation in visual quality and environment coherence over time. We attribute this degradation primarily to exposure bias: during training, individual pipeline components ($\gW_\theta$, $\gC_\theta$ and $\gP_\theta$) are trained using ground truth data; at inference, they condition on their own past predictions and on predictions from other components, causing a train-inference distribution mismatch that grows over time. We report examples of generation artifacts that occur over the course of a 2000-step episode in \Cref{c4:fig:limitations}. Leveraging PERSIST's fully differentiable pipeline, future work could explore incorporating an end-to-end post-training stage on generated rollouts, thereby aligning the training and inference distributions. As demonstrated in recent work~\citep{huang2025self}, this approach can be effective in making AR models robust to their own imperfect predictions.
+
+\textbf{Unconstrained spatial memory.} PERSIST presently tracks a finite region of 3D space centred on the agent, causing information from distant locations to be discarded as the agent moves through the environment. To retain spatial information over arbitrarily large environments, future work could consider a conditioning strategy for $\gW_\theta$ based on loading spatial chunks from a 3D memory bank. Whereas pixel memory banks suffer from viewpoint redundancy, a 3D store is inherently deduplicated and spatially organized, offering unique advantages for efficient storage and retrieval of spatial information.
+
+
+
+
+
+
+\begin{figure}[!htb]
+  \centering
+
+  % helper length: (optional) tighten vertical spacing between rows
+  \begin{minipage}{0.7\linewidth}
+        \setlength{\tabcolsep}{0pt}
+
+  % --- Row 1
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s00.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 0 (0 seconds)}. Start of the episode. Generation is stable.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 2
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s28.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 672 (28 seconds)}. A tree trunk disappears from the 3D representation. As a result only the tree foliage is rendered to the left of the agent.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 3
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s37.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 888 (37 seconds)}. Several wood blocks are wrongly predicted by $\gW_\vtheta$ and appear in the 3D representation. They get rendered in the agent's view.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 4
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s54.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 1296 (54 seconds)}. The texture of the ground is drifting to a yellowish colour. The 3D representation remains stable.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 5
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s55.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 1320 (55 seconds)}. $\gP_\vtheta$ recovers the correct texture thanks to the grounding provided by $\vw_{2D}$.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 6
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s69.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 1656 (69 seconds)}. A collision gets mispredicted and the agent clips through a block. The ground texture begins to drift.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 7
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s70.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 1680 (70 seconds)}. The model recovers from terrain clipping and texture drift after the agent executes a jump action.
+  \end{minipage}\par\vspace{0.1em}
+
+  % --- Row 8
+  \noindent
+  \begin{minipage}[c]{0.26\linewidth}
+    \centering
+    \begin{tcolorbox}[myimg,width=\linewidth]
+    \includegraphics[width=\linewidth]{figs/limitations/s83.png}
+    \end{tcolorbox}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.55\linewidth}
+    \textbf{Step 2000 (83 seconds)}. The episode concludes on a stable frame. The environment remains globally coherent after 2000 steps, but artifacts occur more frequently due to exposure bias.
+  \end{minipage}
+  \end{minipage}
+
+\vspace{0.05cm}
+  \caption{Generation artifacts and subsequent recoveries over a 2000-step (83 seconds) episode generated with PERSIST. The 3D representation drifts locally, causing individual blocks to appear and disappear from the agent's view. However we find that the 3D representation remains globally coherent and has a net stabilising effect on generation, allowing $\gP_\theta$ to recover from visual artifacts. This lets PERSIST generate rollouts lasting thousands of steps, even if glitches become more frequent over time due to autoregressive drift.}
+  \label{c4:fig:limitations}
+\end{figure}
+
+\clearpage
 \section{Conclusion}
 \vspace{-0.22cm}
 In this work, we introduced PERSIST, a world modelling framework that tracks the evolution of a persistent latent 3D state. Our results demonstrate that actively generating guidance frames from this 3D state substantially improves spatial memory, temporal coherence, and overall generation quality and stability compared to conditioning on pixel-based histories. We show that tracking this 3D world state allows the model to capture environment dynamics occurring beyond the agent's view. Additionally, it lets users pre-specify, visualise, and modify the structure of generated environments, creating new ways of controlling generated experiences.
 
-Despite these advances, PERSIST currently relies on ground-truth 3D supervision during training and maintains a finite region of 3D space in memory. Furthermore, our implementation was not optimised for inference speed and does not yet achieve real-time inference. We believe these limitations outline a clear roadmap for future research involving persistent 3D world states: in-the-wild training via synthetic 3D annotations obtained from 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages}, end-to-end post-training on generated rollouts to mitigate autoregressive drift~\citep{huang2025self}, and access to unconstrained spatial memory via a 3D memory bank. We provide a detailed discussion of these directions in Appendix~\ref{c4:app:limitations}.
+Despite these advances, PERSIST currently relies on ground-truth 3D supervision during training and maintains a finite region of 3D space in memory. Furthermore, our implementation was not optimised for inference speed and does not yet achieve real-time inference. We believe these limitations outline a clear roadmap for future research involving persistent 3D world states: in-the-wild training via synthetic 3D annotations obtained from 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages}, end-to-end post-training on generated rollouts to mitigate autoregressive drift~\citep{huang2025self}, and access to unconstrained spatial memory via a 3D memory bank. We provide a detailed discussion of these directions in Section~\ref{c4:sec:limitations}.
 
 \section*{Impact Statement}
 
@@ -927,145 +1069,6 @@ We report inference speed comparisons of our PERSIST-S configuration against bas
 Finally, we test an inference configuration of PERSIST-S employing 2 and 4 denoising steps for $\gW_\theta$ and $\gP_\theta$, respectively. This results in an inference speed of 886 ms (1.13 FPS), a $3\times$ improvement over employing 20 denoising steps. Interestingly, performance degradation is limited and generation remains stable without requiring any fine-tuning or timestep distillation; FVD increases from 159/170/179 to 207/230/244 at 200/400/600 frames.
 
 While PERSIST does not yet run in real time, we are encouraged by the minimal performance degradation of PERSIST-S and its fast inference configuration compared to the base configuration. We expect that additional speedups achieved through increased spatial and temporal compression, smaller models, and more efficient implementations could enable PERSIST to achieve real-time interactivity. We leave this investigation to future work.
-
-\section{Limitations and Future Work}\label{c4:app:limitations}
-
-\textbf{Training without ground truth 3D supervision.} Our results underscore the critical role of explicit 3D representations in maintaining environmental coherence over long horizons. Currently, however, PERSIST acquires this representation via supervised training, restricting its applicability to simulators or datasets providing 3D annotations~\citep[e.g.][]{zhou2018stereo,Matterport3D,yeshwanth2023scannet++}. A key direction for future work is to relax this dependency by learning 3D representations directly from pixels, or by leveraging recent advances in 2D-to-3D foundation models~\citep{wang2025vggt,sam3dteam2025sam3d3dfyimages} to generate synthetic 3D annotations as a pre-processing step.
-
-\textbf{Eliminating exposure bias.} While PERSIST yields substantial improvements in generation quality, temporal stability, and environmental coherence over baselines, human evaluators tend to prefer ground-truth videos in head-to-head comparisons, reporting a gradual degradation in visual quality and environment coherence over time. We attribute this degradation primarily to exposure bias: during training, individual pipeline components ($\gW_\theta$, $\gC_\theta$ and $\gP_\theta$) are trained using ground truth data; at inference, they condition on their own past predictions and on predictions from other components, causing a train-inference distribution mismatch that grows over time. We report examples of generation artifacts that occur over the course of a 2000-step episode in \Cref{c4:fig:limitations}. Leveraging PERSIST's fully differentiable pipeline, future work could explore incorporating an end-to-end post-training stage on generated rollouts, thereby aligning the training and inference distributions. As demonstrated in recent work~\citep{huang2025self}, this approach can be effective in making AR models robust to their own imperfect predictions.
-
-\textbf{Unconstrained spatial memory.} PERSIST presently tracks a finite region of 3D space centred on the agent, causing information from distant locations to be discarded as the agent moves through the environment. To retain spatial information over arbitrarily large environments, future work could consider a conditioning strategy for $\gW_\theta$ based on loading spatial chunks from a 3D memory bank. Whereas pixel memory banks suffer from viewpoint redundancy, a 3D store is inherently deduplicated and spatially organized, offering unique advantages for efficient storage and retrieval of spatial information.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=1\linewidth]{figs/camera_clip.jpg}
-    \caption{Conditioning on the
-ground truth camera trajectory results in physical inconsistency with the world-frame, causing the agent to phase
-through a wall.}
-    \label{c4:fig:camera_clip}
-\end{figure}
-
-
-\begin{figure}[!htb]
-  \begin{center}
-    \centerline{\includegraphics[width=0.75\linewidth]{figs/w0_generations.png}}
-    \caption{PERSIST generates diverse but coherent initial world frames from a single RGB conditioning observation. Each row corresponds to a specific input RGB frame, while each column depicts the initial world frame sampled from $\gW_\theta$ during a specific generation episode.}
-    \label{c4:fig:w0_gen}
-  \end{center}
-\end{figure}
-
-\begin{figure}[!htb]
-  \centering
-
-  % helper length: (optional) tighten vertical spacing between rows
-  \begin{minipage}{0.7\linewidth}
-        \setlength{\tabcolsep}{0pt}
-
-  % --- Row 1
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s00.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 0 (0 seconds)}. Start of the episode. Generation is stable.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 2
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s28.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 672 (28 seconds)}. A tree trunk disappears from the 3D representation. As a result only the tree foliage is rendered to the left of the agent.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 3
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s37.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 888 (37 seconds)}. Several wood blocks are wrongly predicted by $\gW_\vtheta$ and appear in the 3D representation. They get rendered in the agent's view.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 4
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s54.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 1296 (54 seconds)}. The texture of the ground is drifting to a yellowish colour. The 3D representation remains stable.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 5
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s55.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 1320 (55 seconds)}. $\gP_\vtheta$ recovers the correct texture thanks to the grounding provided by $\vw_{2D}$.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 6
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s69.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 1656 (69 seconds)}. A collision gets mispredicted and the agent clips through a block. The ground texture begins to drift.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 7
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s70.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 1680 (70 seconds)}. The model recovers from terrain clipping and texture drift after the agent executes a jump action.
-  \end{minipage}\par\vspace{0.1em}
-
-  % --- Row 8
-  \noindent
-  \begin{minipage}[c]{0.26\linewidth}
-    \centering
-    \begin{tcolorbox}[myimg,width=\linewidth]
-    \includegraphics[width=\linewidth]{figs/limitations/s83.png}
-    \end{tcolorbox}
-  \end{minipage}\hfill
-  \begin{minipage}[c]{0.55\linewidth}
-    \textbf{Step 2000 (83 seconds)}. The episode concludes on a stable frame. The environment remains globally coherent after 2000 steps, but artifacts occur more frequently due to exposure bias.
-  \end{minipage}
-  \end{minipage}
-
-\vspace{0.05cm}
-  \caption{Generation artifacts and subsequent recoveries over a 2000-step (83 seconds) episode generated with PERSIST. The 3D representation drifts locally, causing individual blocks to appear and disappear from the agent's view. However we find that the 3D representation remains globally coherent and has a net stabilising effect on generation, allowing $\gP_\theta$ to recover from visual artifacts. This lets PERSIST generate rollouts lasting thousands of steps, even if glitches become more frequent over time due to autoregressive drift.}
-  \label{c4:fig:limitations}
-\end{figure}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{subappendices}
 

@@ -23,20 +23,20 @@ Our primary finding is that when separated, the representations for the actor an
 % Extracting relevant information from a stream of high-dimensional observations is a known challenge for deep reinforcement learning agents. Yet, in the case of actor-critic algorithms, which traditionally share the same feature embedding, or representation, between the actor and critic, it is unclear what constitutes ``relevant information'', and whether the same information is relevant for the actor and the critic's respective learning objectives. When separated, we find that the actor and critic representations will diverge in what information they extract from the environment. Yet, an interplay still exists between the actor's and critic's respective representations and challenges the notion that knowledge transfer between the critic and the actor only occurs through weight sharing or knowledge distillation. We discover that a separate critic will still influence policy updates to ensure future trajectories will contain information relevant to its own learning objective. This in turn may cause information to leak into the actor's representation, even when no direct knowledge distillation is taking place. Finally, we demonstrate how these insights help select representation learning objectives that play into the actor's and critic's respective knowledge specialisations, and improve performance over a range of discrete and continuous control tasks.
 
 \section{Introduction}
-% wrapfigure unwrapped to a normal float (original wrap width 0.34\textwidth).
-\begin{figure}[t]
+In recent years, auxiliary representation learning objectives have become increasingly prominent in deep reinforcement learning (RL) agents~\citep{yarats2021image,mhairiCMID}. These objectives facilitate extracting relevant features from high dimensional observations, and can help improve the sample efficiency and generalisation capabilities of both value-based~\citep{anand2019unsupervised,Schwarzer2021DataEfficientRL} and actor-critic methods~\citep{sac-ae,dbc,mcinroe2023hksl}. However, knowing whether a particular representation learning objective will work and understanding \textit{why} it works is often difficult due to the interplay between the different components of modern RL algorithms.
+
+Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy improvement and value estimation objectives. When parametrised by deep neural networks, the actor (in charge of improving the policy) and the critic (in charge of estimating the value of the current policy) often share the same learned representation $\phi$, which maps observations to latent features $z$. \citet{PPG} and \citet{raileanu2021decoupling} report that fully separating the actor and critic networks, i.e. \textit{decoupling} the two (\Cref{c2:fig:1}, right), improves sample efficiency and generalisation over a shared architecture (\Cref{c2:fig:1}, left). We hypothesise that decoupling is effective because it encourages information specialisation in $\phi_A$ and $\phi_C$, which in turn improves performance. To test our hypothesis, we introduce metrics to quantify specialisation, and we conduct an extensive empirical study of three on-policy actor-critic algorithms~\citep{PPO,PPG,DCPG} across discrete and continuous control benchmarks, and under various representation learning approaches~\citep{raileanu2021decoupling,DCPG,raileanu2021UCB-DrAC,MICo} applied to the actor, to the critic, or to both.  We supplement this empirical study by a theoretical characterisation of the information extracted by the actor and critic's respective optimal representations.
+
+\begin{figure}[!htbp]
     \centering
-    \begin{subfigure}[]{0.16\textwidth}
+    \begin{subfigure}[]{0.2128\textwidth}
     \includegraphics[width=\linewidth]{figs/coupled_arch-cropped.pdf}
     \end{subfigure}
-    \begin{subfigure}[]{0.16\textwidth}
+    \begin{subfigure}[]{0.2128\textwidth}
     \includegraphics[width=\linewidth]{figs/decoupled_arch-cropped.pdf}
     \end{subfigure}
     \caption{Models with shared (left) and decoupled representations (right).}\label{c2:fig:1}
 \end{figure}
-In recent years, auxiliary representation learning objectives have become increasingly prominent in deep reinforcement learning (RL) agents~\citep{yarats2021image,mhairiCMID}. These objectives facilitate extracting relevant features from high dimensional observations, and can help improve the sample efficiency and generalisation capabilities of both value-based~\citep{anand2019unsupervised,Schwarzer2021DataEfficientRL} and actor-critic methods~\citep{sac-ae,dbc,mcinroe2023hksl}. However, knowing whether a particular representation learning objective will work and understanding \textit{why} it works is often difficult due to the interplay between the different components of modern RL algorithms.
-
-Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy improvement and value estimation objectives. When parametrised by deep neural networks, the actor (in charge of improving the policy) and the critic (in charge of estimating the value of the current policy) often share the same learned representation $\phi$, which maps observations to latent features $z$. \citet{PPG} and \citet{raileanu2021decoupling} report that fully separating the actor and critic networks, i.e. \textit{decoupling} the two (\Cref{c2:fig:1}, right), improves sample efficiency and generalisation over a shared architecture (\Cref{c2:fig:1}, left). We hypothesise that decoupling is effective because it encourages information specialisation in $\phi_A$ and $\phi_C$, which in turn improves performance. To test our hypothesis, we introduce metrics to quantify specialisation, and we conduct an extensive empirical study of three on-policy actor-critic algorithms~\citep{PPO,PPG,DCPG} across discrete and continuous control benchmarks, and under various representation learning approaches~\citep{raileanu2021decoupling,DCPG,raileanu2021UCB-DrAC,MICo} applied to the actor, to the critic, or to both.  We supplement this empirical study by a theoretical characterisation of the information extracted by the actor and critic's respective optimal representations.
 % \begin{wrapfigure}[]{r}{0.17\textwidth}
 % \vspace{-1cm}
 %     \centering
@@ -68,26 +68,7 @@ Online actor-critic algorithms like PPO~\citep{PPO} jointly optimise policy impr
 %     \caption{Models with shared (left) and decoupled representations (right).}\label{c2:fig:1}
 % \end{figure}
 %
-\begin{table}[!h]
-    \centering
-        \caption{Once decoupled, the actor and critic representations $\phi_A$ and $\phi_C$ specialise in capturing different information from the environment. Reported values correspond to a PPO agent trained in Procgen \citep{procgen}. See \S\ref{c2:sec:bg} and \S\ref{c2:sec:met} for formal definitions of the quantities quoted.}
-    \label{c2:tab:1}
-%    
-\begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{clcc}
-\toprule
-\multicolumn{1}{l}{\multirow{2}{*}{If ... is high,}} & \multirow{2}{*}{it is possible to ...}                                                                                                                            & \multicolumn{2}{l}{\begin{tabular}[c]{@{}l@{}}\% change from using a \\ shared representation\end{tabular}} \\
-\cmidrule(lr){3-4}
-\multicolumn{1}{l}{}                                 &                                                                                                                                                                   & \multicolumn{1}{c}{\Large{$\phi_A$}} \B                                  & \Large{$\phi_C$} \B                               \\ \hline
-$\mut{Z}{L}$                                          & \begin{tabular}[c]{@{}l@{}}\T overfit to training levels (environment instances).\B\end{tabular} & \multicolumn{1}{c}{\large{-20\%}}                                & \large{+35\%}                                 \\
-$\mut{Z}{V}$                                          & use $z$ to predict state values.\B                                                                                                                                  & \multicolumn{1}{c}{\large{+37\%}}                                  & \large{+41\%}                                 \\
-$\mut{(Z,Z')}{A}$                                     & \begin{tabular}[c]{@{}l@{}}use $z$ and $z'$ obtained from consecutive timesteps $t$, $t'$\\ to identify the action taken at timestep $t$.\B\end{tabular}            & \multicolumn{1}{c}{\large{+23\%}}                                  & \large{-48\%}                                 \\
-$\mut{Z}{Z'}$                                         & \begin{tabular}[c]{@{}l@{}}differentiate between latent pairs obtained from \\ consecutive and non-consecutive timesteps.\end{tabular}                            & \multicolumn{1}{c}{\large{-96\%}}                                  & \large{+324\%} \\
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-% \vspace{-0.2cm}
-\end{table}
+
 %
 % TODO: template table to replace fig 5.
 % Please add the following required packages to your document preamble:
@@ -121,6 +102,32 @@ Our main findings are summarised below.\begin{itemize}[leftmargin=*]
 \end{itemize}
 %
 \end{tcolorbox}
+
+\begin{table}[!htbp]
+    \centering
+        \caption[Once decoupled, the actor and critic representations $\phi_A$ and $\phi_C$ specialise in capturing different information from the environment. Reported values correspond to a PPO agent trained in Procgen \citep{procgen}. See \S\ref{c2:sec:bg} and \S\ref{c2:sec:met} for formal definitions of the quantities quoted.]{Once decoupled, the actor and critic representations $\phi_A$ and $\phi_C$ specialise in capturing different information from the environment. Reported values correspond to a PPO agent trained in Procgen \citep{procgen}. Here $I(\cdot;\cdot)$ denotes mutual information; $Z$ and $Z'$ denote latent features from consecutive observations, $L$ the training-level identity, $V$ the discounted return, and $A$ the intervening action. The lowercase $z$ denotes an individual latent feature vector. See \S\ref{c2:sec:bg} and \S\ref{c2:sec:met} for formal definitions of the quantities quoted.}
+    \label{c2:tab:1}
+%
+\begin{adjustbox}{max width=\linewidth}
+\begin{tabular}{clcc}
+\toprule
+\multicolumn{1}{l}{\multirow{2}{*}{If ... is high,}} & \multirow{2}{*}{it is possible to ...}                                                                                                                            & \multicolumn{2}{l}{\begin{tabular}[c]{@{}l@{}}\% change from using a \\ shared representation\end{tabular}} \\
+\cmidrule(lr){3-4}
+\multicolumn{1}{l}{}                                 &                                                                                                                                                                   & \multicolumn{1}{c}{\Large{$\phi_A$}} \B                                  & \Large{$\phi_C$} \B                               \\ \hline
+$\mut{Z}{L}$                                          & \begin{tabular}[c]{@{}l@{}}\T overfit to training levels (environment instances).\B\end{tabular} & \multicolumn{1}{c}{\large{-20\%}}                                & \large{+35\%}                                 \\
+$\mut{Z}{V}$                                          & use $z$ to predict state values.\B                                                                                                                                  & \multicolumn{1}{c}{\large{+37\%}}                                  & \large{+41\%}                                 \\
+$\mut{(Z,Z')}{A}$                                     & \begin{tabular}[c]{@{}l@{}}use $z$ and $z'$ obtained from consecutive timesteps $t$, $t'$\\ to identify the action taken at timestep $t$.\B\end{tabular}            & \multicolumn{1}{c}{\large{+23\%}}                                  & \large{-48\%}                                 \\
+$\mut{Z}{Z'}$                                         & \begin{tabular}[c]{@{}l@{}}differentiate between latent pairs obtained from \\ consecutive and non-consecutive timesteps.\end{tabular}                            & \multicolumn{1}{c}{\large{-96\%}}                                  & \large{+324\%} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+% \vspace{-0.2cm}
+\end{table}
+%
+\section{Related Work}
+\textbf{Representation learning in RL.} Representation learning objectives  have been used in RL for a variety of reasons such as sample efficiency~\citep{original,deepmdp,RL_aug_data,pisac,CURL}, planning~\citep{plan2explore,ptgood}, disentanglement~\citep{dunion2023ted}, and generalisation~\citep{darla,darl}. Some works focus on designing metrics motivated by theoretical properties such as bisimulation metrics, pseudometrics, decompositions of MDP components, or successor features~\citep{Bisim2004,proto-value,successor-feat,castro2020scalable,PSM,MICo,ksme}.
+
+\textbf{Analysing representations in RL.} Despite the large body of research into representation learning objectives in RL, relatively little work has gone into understanding the learned representations themselves \citep{wang2024investigating}. Several works use linear probing to determine how well learned representations relate to environment or agent properties~\citep{supervise-thyself,belief-repr,anand2019unsupervised,reward-probing}. Other works analyse the learned representation functions via saliency maps which help visualise where an agent is ``paying attention''~\citep{saliency-worth,saliency-question,mhairiCMID}.
 %
 \section{Background}\label{c2:sec:bg}
 % \textbf{Reinforcement learning.} We consider the episodic RL setting, and model the environment as a Markov Decision Process (MDP) $( \sA, \sS, \mathcal{T}, R, p_0, \gamma )$ where $\sA$ is the action space, $\sS$ is the state space, $\mathcal{T} : \sS \times \sA \rightarrow \Delta^\sS$ the transition kernel (denoting $\Delta^\sS$ as the probability simplex over $\sS$), $R:\sS\times \sA\rightarrow \sR$ is the reward function, $p_0 \in \Delta^{\sS}$ is the initial state distribution and $\gamma$ is the discount factor. % We consider the episodic RL setting, and model an individual environment instance as a Partially Observable Markov Decision Process (POMDP) $( \sA, \sO, \sS, \mathcal{T}, \Omega, R, p_0, \gamma )$ where $\sA$ is the action space, $\sO$ is the observation space, $\sS$ is the state space, $\mathcal{T} : \sS \times \sA \rightarrow \Delta^\sS$ and $\Omega: \sS \rightarrow \Delta^\sO$ are the transition and observation kernels (denoting $\Delta^\sS$ as the probability simplex over $\sS$), $R:\sS\times \sA\rightarrow \sR$ is the reward function, $p_0 \in \Delta^{\sS}$ is the initial state distribution and $\gamma$ is the discount factor. 
@@ -151,11 +158,14 @@ where $\beta_\text{c}$ controls the distortion of the policy. When decoupled, $\
     \mut{X}{Y} = \entropy(X) + \entropy(Y) - \entropy(X,Y) = \sum_{\sX} \sum_{\sY} p(x, y) \log \frac{p(x, y)}{p(x)p(y)},
 \end{equation}
 where integrals replace sums for continuous quantities. $\mut{X}{Y}$ is symmetric, and quantifies how much information about $Y$ is obtained by observing $X$, and vice versa. Similarly, the conditional mutual information $\mut{X}{Y|Z}$ measures the information shared between $X$ and $Y$ that does not depend on $Z$. %Finally, our results build upon the data-processing inequality, which states that when $X$, $Y$ and $Z$ form the Markov chain $X\rightarrow Y \rightarrow Z$ we have $\mut{X}{Z}\leq \mut{X}{Y}$. Simply put, all information that ``flows'' from $X$ to $Z$ must first flow through $Y$.
-We measure mutual information using the k-nearest neighbors entropy estimator proposed by \citet{kraskov2004estimating} and extended to pairings of continuous and discrete variables by \citet{ross2014mutual}. We briefly introduce notation for random variables used in following sections. $L\sim P(\rc)$ denotes the set of training levels drawn from the CMDP context distribution. $A$, $R$, $O$, $O'$, $X$ and $X'$ are sets constructed from $n$ transitions $( a_t, r_t, o_t, o_{t+1}, x_t, x_{t+1})$ uniformly sampled from a batch of trajectories collected in $L$ using policy $\pi$. $Z$ and $Z'$ are latents features, with $z=\phi(o),z'=\phi(o')$. We construct $V$ using the rewards obtained from $t$ until episode termination, with $v_t =\sum^{T}_{\bar{t}=t}\gamma^{\bar{t} - t} r_{\bar{t}}$. 
+We measure mutual information using the k-nearest neighbors entropy estimator proposed by \citet{kraskov2004estimating} and extended to pairings of continuous and discrete variables by \citet{ross2014mutual}.
 % This makes $V$ a collection of samples collected in $L$ of the random variable determining state values. %are samples collected in $L$ of the random variable determining state values, %Writing $V^\pi(x|L)$ as the value of $x$ when the expectation is taken over $L$, we have $V^\pi (x|L) = \E[V_{v_t|x_t=x}]$. In other words, 
 %It is non-negative, and $\mut{X}{Y}=0$ means that $X$ and $Y$ are independently distributed. $\mut{X}{Y}$ captures linear and non-linear dependencies and invariant to scaling or permutations 
 %
 \section[Categorising and quantifying extracted information]{Categorising and quantifying the information extracted by learned representations}\label{c2:sec:met}
+
+We briefly introduce notation for the random variables used in the analysis that follows. $L\sim P(\rc)$ denotes the set of training levels drawn from the CMDP context distribution. $A$, $R$, $O$, $O'$, $X$ and $X'$ are sets constructed from $n$ transitions $( a_t, r_t, o_t, o_{t+1}, x_t, x_{t+1})$ uniformly sampled from a batch of trajectories collected in $L$ using policy $\pi$. $Z$ and $Z'$ are latent features, with $z=\phi(o),z'=\phi(o')$. We construct $V$ using the rewards obtained from $t$ until episode termination, with $v_t =\sum^{T}_{\bar{t}=t}\gamma^{\bar{t} - t} r_{\bar{t}}$.
+
 %
 To conduct our analysis of the respective functions of the actor and critic representations, we analyse the information being extracted from observations at agent convergence. We propose four mutual information metrics to measure information extracted about the identity of the current training level, the value function, and the inverse and forward dynamics of the environment. Each metric relates to quantities relevant to the actor and critic's respective learning objectives, and to the agent's generalisation performance. They are introduced in turn below.
 %This categorisation is not meant t completely capture what information gets extracted by representations. However, it highlights a specialisation for the actor's and critic's representations. Moreover, our proposed categorisation is strengthened by different theoretical arguments, which are discussed next.
@@ -359,11 +369,6 @@ For example, $\comp{Z_A}{V}$ measures the fraction of available information in $
 
 Finally, we highlight that this data collection bias generally leads to worse performance (\Cref{c2:fig:complete-returns}). Interestingly, employing different representation learning objectives for the actor and the critic results in surprising interactions. Consider PPO in the Procgen setup: when applied separately, Adv(A) and MICo(C) have respectively a neutral and adverse effect on performance, the latter being caused by the data collection bias caused by the critic. When applied together, they exhibit a sharp performance gain, and bring $\mut{O}{V}$ down (\Cref{c2:fig:procgen_all_miO}). This suggests that certain actor representation objectives could improve performance by cancelling the bias in data collection induced by the critic.
 %
-\section{Related work}
-\textbf{Representation learning in RL.} Representation learning objectives  have been used in RL for a variety of reasons such as sample efficiency~\citep{original,deepmdp,RL_aug_data,pisac,CURL}, planning~\citep{plan2explore,ptgood}, disentanglement~\citep{dunion2023ted}, and generalisation~\citep{darla,darl}. Some works focus on designing metrics motivated by theoretical properties such as bisimulation metrics, pseudometrics, decompositions of MDP components, or successor features~\citep{Bisim2004,proto-value,successor-feat,castro2020scalable,PSM,MICo,ksme}.
-
-\textbf{Analysing representations in RL.} Despite the large body of research into representation learning objectives in RL, relatively little work has gone into understanding the learned representations themselves \citep{wang2024investigating}. Several works use linear probing to determine how well learned representations relate to environment or agent properties~\citep{supervise-thyself,belief-repr,anand2019unsupervised,reward-probing}. Other works analyse the learned representation functions via saliency maps which help visualise where an agent is ``paying attention''~\citep{saliency-worth,saliency-question,mhairiCMID}.
-%
 \section{Conclusion}
 In this work, we conducted an in-depth analysis of the representations learned by actor and critic networks in on-policy deep reinforcement learning. Our key findings revealed that when decoupled, actor and critic representations specialise in extracting different types of information from the environment. We found that the actor benefits from representation learning objectives that promote extracting level-invariant information. Finally, we discovered that the critic influences policy updates to collect data that is informative for its own learning objective.
 
@@ -372,7 +377,7 @@ We identify three important research directions to be tackled in future work: 1)
 %TODO: move to ccl in online RL, Future work could explore designing new exploration strategies and representation learning objectives based on these findings, and whether we observe similar specialisation and interplay outside of the online and on-policy setting, and under different network architectures.
 %
 \section*{Reproducibility Statement}
-Reproducibility can be challenging without access to the data generated during experiments. To assist with this, we will make all of our experimental data, including model checkpoints, logged data and the code for reproducing the figures in this paper openly available at \href{https://github.com/francelico/deac-rep}{github.com/francelico/deac-rep}.
+Reproducibility can be challenging without access to the data generated during experiments. To assist with this, we will make all of our experimental data, including model checkpoints, logged data and the code for reproducing the figures in this chapter openly available at \href{https://github.com/francelico/deac-rep}{github.com/francelico/deac-rep}.
 
 % \subsubsection*{Author Contributions}
 % If you'd like to, you may include  a section for author contributions as is done

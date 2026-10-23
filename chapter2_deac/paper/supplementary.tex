@@ -428,7 +428,7 @@ At the end of training we collect a batch of trajectories consisting of $2^{16}$
 \end{enumerate}
 
 \subsection{Procgen}\label{c2:app:results_procgen}
-The Procgen Benchmark is a set of 16 diverse PCG environments that echoes the gameplay variety seen in the ALE benchmark \cite{ALE}. The game levels, determined by a random seed, can differ in visual design, navigational structure, and the starting locations of entities. All Procgen environments use a common discrete 15-dimensional action space and generate $64 \times 64 \times 3$ RGB observations. A detailed description of each of the 16 environments is provided by \citet{procgen}. RL algorithms such as PPO reveal significant differences between test and training performance in all games, making Procgen a valuable tool for evaluating generalisation performance. 
+The Procgen Benchmark is a set of 16 diverse PCG environments that echoes the gameplay variety seen in the ALE benchmark \citep{ALE}. The game levels, determined by a random seed, can differ in visual design, navigational structure, and the starting locations of entities. All Procgen environments use a common discrete 15-dimensional action space and generate $64 \times 64 \times 3$ RGB observations. A detailed description of each of the 16 environments is provided by \citet{procgen}. RL algorithms such as PPO reveal significant differences between test and training performance in all games, making Procgen a valuable tool for evaluating generalisation performance.
 
 We conduct our experiment on the easy setting of Procgen, which employs 200 training levels and a budget of 25M training steps, and evaluate the agent's scores on the training levels and on the full range of levels, excluding the training levels. We use the version of Procgen provided by EnvPool \citep{weng2022envpool}. Following prior work, \citep{raileanu2021UCB-DrAC,PLR,DCPG}, for each game we normalise train$/$test scores by the mean train$/$test score achieved by PPO in that game. 
 
@@ -499,7 +499,7 @@ Advantage prediction coefficient & 0.25 & - \\
 \subsection{Brax}
 For our experiments in Brax, we implement a custom ``video distractors'' set of tasks, similar to those from~\citep{DistractingDM}. In this setup, a video plays in an overlay on the pixels the agent views. There is a disjoint set of videos between the training and testing environments. The random seed determines the environment's initial physics and the video overlay at the beginning of training. The pixels themselves are full-RGB $64\times64\times3$ arrays, but we use framestacking to bring each agent input to $64\times64\times9$ pixels.
 
-Similar to the algorithms used in the Procgen experiments, we implement our algorithms in JAX and base them on ClearnRL.
+Similar to the algorithms used in the Procgen experiments, we implement our algorithms in JAX and base them on CleanRL.
 
 We conduct our experiments on RTX A4500 Nvidia GPUs and 6 CPU cores. One seed completes in 7.5-48 hours, depending on the environment and its physics backend as well as the algorithm.
 
