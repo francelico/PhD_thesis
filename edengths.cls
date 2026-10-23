@@ -233,7 +233,6 @@
    \AtEndOfClass{\RequirePackage[inner]{showlabels}}%
 }{}
 
-
 %%%% MORE PACKAGES CAN BE DEFINED IN packages.tex
 
 %%%% FORMAT DEFINITIONS.
@@ -584,7 +583,8 @@
   %
   I declare that this thesis was composed by myself, that the work contained herein is %
   my own except where explicitly stated otherwise in the text, and that this work has not %
-  been submitted for any other degree or professional qualification except as specified.%
+  been submitted for any other degree or professional qualification except as specified. %
+ Large language models were used during the preparation of this thesis to check grammar and suggest phrasing improvements within individual paragraphs. All suggestions were reviewed and incorporated by the author, who takes full responsibility for the final text.
   %
   \vfill
   %
