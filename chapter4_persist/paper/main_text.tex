@@ -182,8 +182,10 @@ This enables a transition from passive video generation to interactive world sim
 \begin{equation}
     \mathcal{E} = \langle \mathbb{S} , \mathbb{O}, \mathbb{A}, \Omega, p\rangle,
 \end{equation}
- where $\mathbb{S}$ is the space of latent states, $\mathbb{O}$ the space of observations, $\mathbb{A}$ the set of actions that may be taken within the environment, $\Omega : \mathbb{S} \rightarrow \mathbb{O}$ a partial projection function mapping states to observations, and $p(s^\prime|a,s)$ is a transition probability function such that $s,s^\prime \in \mathbb{S}\times\mathbb{S}$ and $a \in \mathbb{A}$. 
+ where $\mathbb{S}$ is the space of latent states, $\mathbb{O}$ the space of observations, $\mathbb{A}$ the set of actions that may be taken within the environment, $\Omega : \mathbb{S} \rightarrow \mathbb{O}$ a partial projection function mapping states to observations, and $p(s^\prime|a,s)$ is a transition probability function such that $(s,s^\prime) \in \mathbb{S}\times\mathbb{S}$ and $a \in \mathbb{A}$.
 Given a distribution of initial states $p_0$ and episode length $N_0$, a policy $\pi$ in charge of selecting actions in $\mathcal{E}$, and a distance metric between observation sequences $D : \mathbb{O}^n \times \mathbb{O}^n \rightarrow \mathbb{R}$, learning an interactive world simulation of $\mathcal{E}$ consists of minimising the objective $\mathbb{E}[D(O^n, \tilde{O}^n)]$. $O^n$ is a sequence of observations of length $n\sim N_0$ collected in $\mathcal{E}$ from starting state $s_0\sim p_0$ and by following $\pi$; and $\tilde{O}^n$ is obtained from an AR model $\gQ_\theta$ initialised at $\vo_0 = \Omega(s_0)$ and subjected to the same action sequence.
+
+Relative to the CMDP framework in Section~\ref{sec:bg_cmdp}, this formulation omits rewards because the objective is to reproduce action-conditioned observations and dynamics.
 
 \vspace{-0.2cm}
 \section{A Persistent Environment Representation}

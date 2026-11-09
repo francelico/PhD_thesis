@@ -17,12 +17,12 @@
     \begin{theorem}
 For any CMDP such that $|V^\pi (x)| \leq D/2,\forall x, \pi$, with $D$ being a constant, then for any set of training levels $L$, and policy $\pi$
 \begin{equation}
-    \E_{c\sim \mathcal{U}(L), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] - \E_{c\sim P(\rc), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] \leq \sqrt{\frac{2D^2}{|L|} \times \mut{\pi}{L}},
+    \E_{c\sim \mathcal{U}(L), s_0 \sim \mathcal{P}_0(c)}[V^\pi((s_0,c))] - \E_{c\sim P(\rc), s_0 \sim \mathcal{P}_0(c)}[V^\pi((s_0,c))] \leq \sqrt{\frac{2D^2}{|L|} \times \mut{\pi}{L}},
 \end{equation}
 \end{theorem}
 Then, as $\pi \triangleq f \circ \phi_A$, by the data processing inequality we always have $\mut{\pi}{L} \leq \mut{Z_A}{L}$, and therefore,
 \begin{align*}
-    \E_{c\sim \mathcal{U}(L), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] - \E_{c\sim P(\rc), x_0 \sim \mathcal{P}_0(c)}[V^\pi(x_0)] & \leq \sqrt{\frac{2D^2}{|L|} \times \mut{\pi}{L}}\\ 
+    \E_{c\sim \mathcal{U}(L), s_0 \sim \mathcal{P}_0(c)}[V^\pi((s_0,c))] - \E_{c\sim P(\rc), s_0 \sim \mathcal{P}_0(c)}[V^\pi((s_0,c))] & \leq \sqrt{\frac{2D^2}{|L|} \times \mut{\pi}{L}}\\
 & \leq \sqrt{\frac{2D^2}{|L|} \times \mut{Z_A}{L}}
 \end{align*}.
 
